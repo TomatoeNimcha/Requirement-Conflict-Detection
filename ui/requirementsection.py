@@ -24,6 +24,8 @@ class RequirementSection(QWidget):
         # Example Table Contents
         self.table.setItem(0, 0, QTableWidgetItem("REQ-001"))
         self.table.setItem(0, 1, QTableWidgetItem("User can log in"))
+        self.table.setItem(1, 0, QTableWidgetItem("REQ-002"))
+        self.table.setItem(1, 1, QTableWidgetItem("User can log out"))
         layout.addWidget(self.table)
 
         # Buttons

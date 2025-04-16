@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QTableWidget,QTableWidgetItem, QPushButton, QVBoxLayout, QHBoxLayout)
 
 from ui.requirementsection import RequirementSection
-#from ui.menusection import MenuSection
+from ui.warningsection import WarningSection
 
 class MainWindow(QMainWindow):
     def __init__(self,app):
@@ -26,23 +26,27 @@ class MainWindow(QMainWindow):
         import_action = settings_menu.addAction("Import")
         export_action = settings_menu.addAction("Export")
         
+        # --- HEADER TABS ---
+        tab_widget = QTabWidget()
+        tab_widget.setStyleSheet("QTabBar::tab { height: 30px; padding: 8px; }")
+        layout.addWidget(tab_widget, 1, 0, 1, 1)  # center area only
 
-        # Labels (Temporary)
-        # --- HEADER (will be tabs later) ---
-        header_label = QLabel("Tabs go here later")
-        header_label.setStyleSheet("background-color: gray;")
-        header_label.setFixedHeight(50)  # thin header
-        layout.addWidget(header_label, 0, 0, 1, 2)  # row 0, col 0→1
+        # Add requirement table into each tabs
+        tab1 = RequirementSection()
+        tab2 = RequirementSection()
+
+        tab_widget.addTab(tab1, "List 1")
+        tab_widget.addTab(tab2, "List 2")
+
 
         # --- CENTER REQUIREMENT TABLE AREA ---
-        center_widget = RequirementSection()
-        layout.addWidget(center_widget, 1, 0)
+        # center_widget = RequirementSection()
+        # layout.addWidget(center_widget, 1, 0)
         
 
-        # --- WARNING AREA (right side) ---
-        warning_label = QLabel("Warnings go here")
-        warning_label.setStyleSheet("background-color: darkmagenta;")
-        layout.addWidget(warning_label, 1, 1)
+        # --- WARNING AREA  ---
+        warning_widget = WarningSection()
+        layout.addWidget(warning_widget, 1, 1)
 
         # Set column stretches: left wider than right
         layout.setColumnStretch(0, 3)  # main content area
@@ -52,16 +56,3 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
-
-        # # Tabs
-        # tab_widget = QTabWidget(self)
-        # widget_list_1 = QWidget()
-        # widget_list_2 = QWidget()
-        # tab_widget.addTab(widget_list_1,"List 1")
-        # # tab_widget.addTab(widget_list_1,"List 2")
-
-        # # layout = QVBoxLayout()
-        # grid_layout.addWidget(tab_widget,0,1)
-
-        # self.setLayout(grid_layout)
-    
