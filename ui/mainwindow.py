@@ -1,4 +1,6 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QGridLayout, QLabel
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QTabWidget, QWidget, QGridLayout, QLabel,
+    QTableWidget,QTableWidgetItem, QPushButton, QVBoxLayout, QHBoxLayout)
 
 class MainWindow(QMainWindow):
     def __init__(self,app):
@@ -21,15 +23,38 @@ class MainWindow(QMainWindow):
         export_action = settings_menu.addAction("Export")
 
         # Labels (Temporary)
-        label_tabs = QLabel("Insert future tabs here")
-        label_warning = QLabel("Insert future warnings here")
-        label_list = QLabel("Insert future requirement list here")
+        # --- HEADER (will be tabs later) ---
+        header_label = QLabel("Tabs go here later")
+        header_label.setStyleSheet("background-color: gray;")
+        header_label.setFixedHeight(50)  # thin header
+        layout.addWidget(header_label, 0, 0, 1, 2)  # row 0, col 0→1
+
+        # --- CENTER TABLE AREA ---
+        # table_label = QLabel("Table goes here")
+        # table_label.setStyleSheet("background-color: blue;")
+        # layout.addWidget(table_label, 1, 0)
+
+        # Table
+        table = QTableWidget(5, 2)
+        table.setHorizontalHeaderLabels(["Requirement", "Details"])
+
+        # Optional: fill with dummy data
+        table.setItem(0, 0, QTableWidgetItem("REQ-001"))
+        table.setItem(0, 1, QTableWidgetItem("User can log in"))
+
+        # Make it writable: QTableWidget is writable by default!
+        layout.addWidget(table, 1, 0)
+
+        # --- WARNING AREA (right side) ---
+        warning_label = QLabel("Warnings go here")
+        warning_label.setStyleSheet("background-color: darkmagenta;")
+        layout.addWidget(warning_label, 1, 1)
+
+        # Set column stretches: left wider than right
+        layout.setColumnStretch(0, 3)  # main content area
+        layout.setColumnStretch(1, 1)  # warning area
 
         # Set Layout
-        # layout.addWidget(label_tabs, 0,0,1,3)
-        layout.addWidget(label_warning, 1,2,1,1)
-        layout.addWidget(label_list, 1,1,1,2)
-
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
