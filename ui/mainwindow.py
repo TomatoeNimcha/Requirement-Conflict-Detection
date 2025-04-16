@@ -2,6 +2,9 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QWidget, QGridLayout, QLabel,
     QTableWidget,QTableWidgetItem, QPushButton, QVBoxLayout, QHBoxLayout)
 
+from ui.requirementsection import RequirementSection
+#from ui.menusection import MenuSection
+
 class MainWindow(QMainWindow):
     def __init__(self,app):
         super().__init__()
@@ -9,7 +12,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Requirements Conflict Detection Software")
 
         # Layout
-        central_widget = QWidget()
+        #For some reason QMainWindow need central widget to make layout work 
+        central_widget = QWidget() 
         layout = QGridLayout()
 
         # MenuBar and Menus
@@ -21,6 +25,7 @@ class MainWindow(QMainWindow):
         template_action = settings_menu.addAction("Template")
         import_action = settings_menu.addAction("Import")
         export_action = settings_menu.addAction("Export")
+        
 
         # Labels (Temporary)
         # --- HEADER (will be tabs later) ---
@@ -29,21 +34,10 @@ class MainWindow(QMainWindow):
         header_label.setFixedHeight(50)  # thin header
         layout.addWidget(header_label, 0, 0, 1, 2)  # row 0, col 0→1
 
-        # --- CENTER TABLE AREA ---
-        # table_label = QLabel("Table goes here")
-        # table_label.setStyleSheet("background-color: blue;")
-        # layout.addWidget(table_label, 1, 0)
-
-        # Table
-        table = QTableWidget(5, 2)
-        table.setHorizontalHeaderLabels(["Requirement", "Details"])
-
-        # Optional: fill with dummy data
-        table.setItem(0, 0, QTableWidgetItem("REQ-001"))
-        table.setItem(0, 1, QTableWidgetItem("User can log in"))
-
-        # Make it writable: QTableWidget is writable by default!
-        layout.addWidget(table, 1, 0)
+        # --- CENTER REQUIREMENT TABLE AREA ---
+        center_widget = RequirementSection()
+        layout.addWidget(center_widget, 1, 0)
+        
 
         # --- WARNING AREA (right side) ---
         warning_label = QLabel("Warnings go here")
@@ -70,3 +64,4 @@ class MainWindow(QMainWindow):
         # grid_layout.addWidget(tab_widget,0,1)
 
         # self.setLayout(grid_layout)
+    
