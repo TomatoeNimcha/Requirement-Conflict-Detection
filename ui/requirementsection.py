@@ -1,5 +1,3 @@
-# ui/requirement_table_widget.py
-
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QTableWidget, QTableWidgetItem, QPushButton
@@ -19,7 +17,7 @@ class RequirementSection(QWidget):
         # Table
         self.table = QTableWidget(5, 2)
         self.table.setHorizontalHeaderLabels(["Requirement", "Description"])
-        self.table.setColumnWidth(1, 400)
+        self.table.horizontalHeader().setStretchLastSection(True)
 
         # Example Table Contents
         self.table.setItem(0, 0, QTableWidgetItem("REQ-001"))

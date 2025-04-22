@@ -4,6 +4,8 @@ from PySide6.QtWidgets import (
 
 from ui.requirementsection import RequirementSection
 from ui.warningsection import WarningSection
+from ui.tabsection import TabSection
+from ui.menusection import MenuSection
 
 class MainWindow(QMainWindow):
     def __init__(self,app):
@@ -11,32 +13,17 @@ class MainWindow(QMainWindow):
         self.app = app
         self.setWindowTitle("Requirements Conflict Detection Software")
 
-        # Layout
+        # ____LAYOUT____
         #For some reason QMainWindow need central widget to make layout work 
         central_widget = QWidget() 
         layout = QGridLayout()
 
-        # MenuBar and Menus
-        menu_bar = self.menuBar()
-
-        settings_menu = menu_bar.addMenu("&Settings")
-        compare_action = settings_menu.addAction("Compare Lists")
-        merge_action = settings_menu.addAction("Merge Lists")
-        template_action = settings_menu.addAction("Template")
-        import_action = settings_menu.addAction("Import")
-        export_action = settings_menu.addAction("Export")
+        # ____MENU SECTION____
+        self.menu = MenuSection(self)
         
-        # --- HEADER TABS ---
-        tab_widget = QTabWidget()
-        tab_widget.setStyleSheet("QTabBar::tab { height: 30px; padding: 8px; }")
-        layout.addWidget(tab_widget, 1, 0, 1, 1)  # center area only
-
-        # Add requirement table into each tabs
-        tab1 = RequirementSection()
-        tab2 = RequirementSection()
-
-        tab_widget.addTab(tab1, "List 1")
-        tab_widget.addTab(tab2, "List 2")
+        # ____TAB SECTION____
+        tab_widget = TabSection()
+        layout.addWidget(tab_widget, 1, 0, 1, 1)
 
 
         # --- CENTER REQUIREMENT TABLE AREA ---
@@ -44,7 +31,7 @@ class MainWindow(QMainWindow):
         # layout.addWidget(center_widget, 1, 0)
         
 
-        # --- WARNING AREA  ---
+        # ____WARNING SECTION____
         warning_widget = WarningSection()
         layout.addWidget(warning_widget, 1, 1)
 
