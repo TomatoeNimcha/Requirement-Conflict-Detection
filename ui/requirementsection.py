@@ -4,15 +4,20 @@ from PySide6.QtWidgets import (
 )
 
 class RequirementSection(QWidget):
-    def __init__(self):
+    def __init__(self,title="Default Title",author="Default Author"):
         super().__init__()
 
         layout = QVBoxLayout()
 
-        # Label
-        title = QLabel("Requirement Table")
+        # Label Title
+        title = QLabel(title)
         title.setStyleSheet("font-weight: bold; font-size: 16px;")
         layout.addWidget(title)
+
+        # Label Author
+        author = QLabel(author)
+        author.setStyleSheet("font-weight: thin; font-size: 10px;")
+        layout.addWidget(author)
 
         # Table
         self.table = QTableWidget(5, 2)
