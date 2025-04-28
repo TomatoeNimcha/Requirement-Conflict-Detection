@@ -17,13 +17,13 @@ class MainWindow(QMainWindow):
         #For some reason QMainWindow need central widget to make layout work 
         central_widget = QWidget() 
         layout = QGridLayout()
-
-        # ____MENU SECTION____
-        self.menu = MenuSection(self)
         
         # ____TAB SECTION____
         tab_widget = TabSection()
         layout.addWidget(tab_widget, 1, 0, 1, 1)
+
+        # ____MENU SECTION____
+        self.menu = MenuSection(self,tab_widget)
 
 
         # --- CENTER REQUIREMENT TABLE AREA ---

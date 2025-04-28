@@ -3,9 +3,15 @@ from PySide6.QtWidgets import (
     QLabel, QTableWidget, QTableWidgetItem, QPushButton
 )
 
+import json
+
 class RequirementSection(QWidget):
     def __init__(self,title="Default Title",author="Default Author"):
         super().__init__()
+
+        # Declare variables so it is editable later on
+        self.title = title
+        self.author = author
 
         layout = QVBoxLayout()
 
@@ -21,7 +27,7 @@ class RequirementSection(QWidget):
 
         # Table
         self.table = QTableWidget(5, 2)
-        self.table.setHorizontalHeaderLabels(["Requirement", "Description"])
+        self.table.setHorizontalHeaderLabels(["Requirement ID", "Requirement"])
         self.table.horizontalHeader().setStretchLastSection(True)
 
         # Example Table Contents
@@ -52,3 +58,26 @@ class RequirementSection(QWidget):
         selected = self.table.currentRow()
         if selected >= 0:
             self.table.removeRow(selected)
+
+    def to_dictionary(self):
+        requirementList = []
+
+        for row in range(self.table.rowCount()):
+            requirementID_item = self.table.item(row, 0)
+            requirement_item = self.table.item(row, 1)
+
+            requirementID = requirementID_item.text() if requirementID_item else ""
+            requirement = requirement_item.text() if requirement_item else ""
+
+            # Skip empty rows (optional)
+            if requirementID.strip() or requirement.strip():
+                requirementList.append({
+                    "requirementID": requirementID,
+                    "requirement": requirement
+                })
+
+        return {
+            "title": self.title,
+            "author": self.author,
+            "requirementList": requirementList
+        }
