@@ -91,21 +91,33 @@ class RequirementSection(QWidget):
             "author": self.author,
             "requirementList": requirementList
         }
+    
+
+    def highlight_rows(self,row_pairs, color):
+        for row1, row2 in row_pairs:
+            for col in range(self.table.columnCount()):
+                item1 = self.table.item(row1, col)
+                item2 = self.table.item(row2, col)
+                if item1:
+                    item1.setBackground(QColor(color))
+                if item2:
+                    item2.setBackground(QColor(color))
 
 
     def check_conflict(self):
         spacy_checker = SpacyImplementation()
-        conflicts = []
+        conflicts_redundancy = []
+        conflicts_similarity = []
+        conflicts_contradiction = []
 
-        # First, clear all previous background highlights
+        # Clear previous highlights
         for row in range(self.table.rowCount()):
             for col in range(self.table.columnCount()):
                 item = self.table.item(row, col)
                 if item:
-                    item.setBackground(QBrush(Qt.NoBrush))
-                    #no method of removing background so this is the roundabout way to do it apparently
+                    item.setBackground(QBrush(Qt.NoBrush))  
 
-        # Collect all requirements from the table
+        # Gather all valid requirements
         requirements = []
         for row in range(self.table.rowCount()):
             id_item = self.table.item(row, 0)
@@ -114,26 +126,23 @@ class RequirementSection(QWidget):
             if id_item and req_item:
                 req_id = id_item.text().strip()
                 req_text = req_item.text().strip()
-
                 if req_id and req_text:
                     requirements.append((row, req_id, req_text))
 
-        # Compare each requirement to every other
+        # Compare all pairs
         for i in range(len(requirements)):
+            row1, id1, text1 = requirements[i]
             for j in range(i + 1, len(requirements)):
-                row1, id1, text1 = requirements[i]
                 row2, id2, text2 = requirements[j]
 
-                if spacy_checker.similarityCheck(text1, text2):
-                    conflicts.append((row1, row2))
+                if spacy_checker.redundancy_check(text1,text2) == True:
+                    conflicts_redundancy.append((row1, row2))
+                elif spacy_checker.similarity_check(text1,text2) == True:
+                    conflicts_similarity.append((row1, row2))
+                elif spacy_checker.contradiction_check(text1,text2) == True:
+                    conflicts_contradiction.append((row1, row2))
 
-        # Highlight conflicting rows
-        for row1, row2 in conflicts:
-            for col in range(self.table.columnCount()):
-                item1 = self.table.item(row1, col)
-                item2 = self.table.item(row2, col)
-                if item1:
-                    item1.setBackground(QColor("red")) 
-                if item2:
-                    item2.setBackground(QColor("red"))
+        self.highlight_rows(conflicts_redundancy, "red")
+        self.highlight_rows(conflicts_similarity, "yellow")
+        self.highlight_rows(conflicts_contradiction, "orange")
 
