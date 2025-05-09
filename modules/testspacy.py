@@ -18,15 +18,18 @@ doc1 = nlp("I like salty fries and hamburgers.")
 doc2 = nlp("Fast food tastes very good.")
 doc3 = nlp("I like salty fries and burgers.")
 doc4 = nlp("Today, the world of technology had expanded beyond comprehension!")
+doc5 = "I am feeling great today"
+doc6 = "To be a man is to be brave."
 
 # Similarity of two documents
 print(doc1, "<->", doc2, doc1.similarity(doc2))
 print(doc1, "<->", doc3, doc1.similarity(doc3))
 print(doc1, "<->", doc4, doc1.similarity(doc4))
-# # Similarity of tokens and spans
-# french_fries = doc1[2:4]
-# burgers = doc1[5]
-# print(french_fries, "<->", burgers, french_fries.similarity(burgers))
+
+# Similarity of tokens and spans
+french_fries = doc1[2:4]
+burgers = doc1[5]
+print(french_fries, "<->", burgers, french_fries.similarity(burgers))
 
 
 

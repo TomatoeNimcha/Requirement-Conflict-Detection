@@ -11,11 +11,15 @@ class SpacyImplementation:
         self.negative_keywords = ["must not", "should not", "cannot", "never", "no", "not allowed"]
 
 
-    def redundancy_check(self, sentence1="", sentence2=""):
+    def spacy_similarity(self,sentence1="", sentence2=""):
         sentence1 = self.nlp(sentence1)
         sentence2 = self.nlp(sentence2)
 
         similarity = sentence1.similarity(sentence2)
+
+        return similarity
+
+    def redundancy_check(self, similarity=0.0):
         print(f"Similarity: {similarity:.4f}")
 
         if similarity  == 1 : 
@@ -26,11 +30,7 @@ class SpacyImplementation:
             print("Not redundant")
             return False
 
-    def similarity_check(self, sentence1="", sentence2=""):
-        sentence1 = self.nlp(sentence1)
-        sentence2 = self.nlp(sentence2)
-
-        similarity = sentence1.similarity(sentence2)
+    def similarity_check(self, similarity=0.0):
         print(f"Similarity: {similarity:.4f}")
 
         if similarity > 0.9009 and similarity < 0.99: #Similarity index, the control of how similar it is
@@ -41,14 +41,10 @@ class SpacyImplementation:
             print("Not similarity")
             return False
 
-    def contradiction_check(self, sentence1="", sentence2=""):
+    def contradiction_check(self, similarity=0.0, sentence1="", sentence2=""):
         has_neg1 = any(neg in sentence1 for neg in self.negative_keywords)
         has_neg2 = any(neg in sentence2 for neg in self.negative_keywords)
 
-        sentence1 = self.nlp(sentence1)
-        sentence2 = self.nlp(sentence2)
-
-        similarity = sentence1.similarity(sentence2)
         print(f"Similarity: {similarity:.4f}")
 
         if similarity > 0.9009 and similarity != 1.0:

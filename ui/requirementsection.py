@@ -11,7 +11,7 @@ from modules.spacyImplementation import SpacyImplementation
 from ui.warningsection import WarningSection
 
 class RequirementSection(QWidget):
-    def __init__(self,title="Default Title",author="Default Author", warning=None):
+    def __init__(self,title="Default Title",author="Default Author", warning_section=None):
         super().__init__()
 
         # Declare variables so it is editable later on
@@ -68,6 +68,22 @@ class RequirementSection(QWidget):
         selected = self.table.currentRow()
         if selected >= 0:
             self.table.removeRow(selected)
+
+
+    def get_table_contents(self):
+        table_contents = []
+
+        for row in range(self.table.rowCount()):
+            id_item = self.table.item(row, 0)
+            req_item = self.table.item(row, 1)
+
+            req_id = id_item.text().strip() if id_item else ""
+            req_text = req_item.text().strip() if req_item else ""
+
+            if req_id or req_text:
+                table_contents.append((row, req_id, req_text))
+
+        return table_contents
 
     def to_dictionary(self):
         requirementList = []
@@ -135,11 +151,13 @@ class RequirementSection(QWidget):
             for j in range(i + 1, len(requirements)):
                 row2, id2, text2 = requirements[j]
 
-                if spacy_checker.redundancy_check(text1,text2) == True:
+                similarity = spacy_checker.spacy_similarity(text1,text2)
+
+                if spacy_checker.redundancy_check(similarity) == True:
                     conflicts_redundancy.append((row1, row2))
-                elif spacy_checker.similarity_check(text1,text2) == True:
+                elif spacy_checker.similarity_check(similarity) == True:
                     conflicts_similarity.append((row1, row2))
-                elif spacy_checker.contradiction_check(text1,text2) == True:
+                elif spacy_checker.contradiction_check(similarity,text1,text2) == True:
                     conflicts_contradiction.append((row1, row2))
 
         self.highlight_rows(conflicts_redundancy, "red")
