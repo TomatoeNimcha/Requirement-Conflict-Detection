@@ -27,35 +27,38 @@ class WarningSection(QWidget):
     def add_dummy_warning(self):
         self.add_warning("Warning: Requirement Conflict Found!")
 
-    # def add_warning(self, text):
-    #     warning_label = QLabel(text)
-    #     warning_label.setWordWrap(True)
-    #     warning_label.setStyleSheet("""
-    #         background-color: red;
-    #         padding: 6px;
-    #         border-radius: 8px;
-    #     """)
-    #     warning_label.setFrameStyle(QFrame.Panel | QFrame.Raised)
-    #     self.warning_layout.addWidget(warning_label, alignment=Qt.AlignTop)
 
-    #     if self.warning_section:
-    #         # Clear all previous warnings
-    #         for i in reversed(range(self.warning_section.warning_layout.count())):
-    #             widget = self.warning_section.warning_layout.itemAt(i).widget()
-    #             if widget:
-    #                 widget.setParent(None)
+    def clear_warnings(self):
+        while self.warning_layout.count():
+            child = self.warning_layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
 
-    #     if spacy_checker.redundancy_check(text1, text2):
-    #         conflicts_redundancy.append((row1, row2))
-    #         if self.warning_section:
-    #             self.warning_section.add_warning(f"Requirement '{id1}' and '{id2}' are redundant.")
 
-    #     elif spacy_checker.similarity_check(text1, text2):
-    #         conflicts_similarity.append((row1, row2))
-    #         if self.warning_section:
-    #             self.warning_section.add_warning(f"Requirement '{id1}' and '{id2}' are similar.")
+    def add_warning(self, text):
+        bubble = QWidget()
+        layout = QVBoxLayout()
+        bubble.setLayout(layout)
+        
+        label = QLabel(text)
+        label.setWordWrap(True)
+        label.setStyleSheet("""
+            background-color: #ffe6e6;
+            border: 1px solid #ff4d4d;
+            padding: 8px;
+            border-radius: 10px;
+            color: #990000;
+            font-weight: bold;
+        """)
+        
+        layout.addWidget(label)
+        self.warning_layout.addWidget(bubble)
 
-    #     elif spacy_checker.contradiction_check(text1, text2):
-    #         conflicts_contradiction.append((row1, row2))
-    #         if self.warning_section:
-    #             self.warning_section.add_warning(f"Requirement '{id1}' and '{id2}' contradict each other.")
+    def conflict_warning(self,conflicts=[]):
+        self.clear_warnings()
+        for pair in conflicts["redundancy"]:
+            self.add_warning(f"Redundant: Row {pair[0]} and {pair[1]}")
+        for pair in conflicts["similarity"]:
+            self.add_warning(f"Similar: Row {pair[0]} and {pair[1]}")
+        for pair in conflicts["contradiction"]:
+            self.add_warning(f"Contradiction: Row {pair[0]} and {pair[1]}")

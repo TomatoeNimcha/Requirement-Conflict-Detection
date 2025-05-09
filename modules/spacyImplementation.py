@@ -12,6 +12,7 @@ class SpacyImplementation:
 
 
     def spacy_similarity(self,sentence1="", sentence2=""):
+        print(f"{sentence1} vs {sentence2}")
         sentence1 = self.nlp(sentence1)
         sentence2 = self.nlp(sentence2)
 
@@ -33,7 +34,7 @@ class SpacyImplementation:
     def similarity_check(self, similarity=0.0):
         print(f"Similarity: {similarity:.4f}")
 
-        if similarity > 0.9009 and similarity < 0.99: #Similarity index, the control of how similar it is
+        if similarity > 0.9009 and similarity < 1.0: #Similarity index, the control of how similar it is
             print("Similar")
             return True
             
@@ -57,8 +58,12 @@ class SpacyImplementation:
         
 # test = SpacyImplementation()
 
+# doc1 = "The user shall log in"
+# doc2 = "The user shall not log in"
 
-# test.contradiction_check("The user shall log in", "The user shall not log in")
+# percentage = test.spacy_similarity(doc1,doc2)
+# test.contradiction_check(percentage, "The user shall log in", "The user shall not log in")
+
 # test.contradiction_check("The user shall log in", "The user shall log in")
 # test.similarity_check("The user shall log in", "The user shall log in")
 # test.redundancy_check("The user shall log in", "The user shall log in")

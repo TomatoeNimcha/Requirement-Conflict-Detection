@@ -3,8 +3,9 @@ from PySide6.QtWidgets import (
     QLabel, QTableWidget, QTableWidgetItem, QPushButton
 )
 
-import json
+from ui.tabsection import TabSection
 from ui.requirementsection import RequirementSection
+from modules.fileOperations import FileOperations
 
 class MenuSection(QWidget):
     def __init__(self, window, tab_widget):
@@ -25,66 +26,55 @@ class MenuSection(QWidget):
         export_action = settings_menu.addAction("Export")
 
         # Connect actions to methods
-        compare_action.triggered.connect(self.compare)
-        merge_action.triggered.connect(self.merge)
-        template_action.triggered.connect(self.template)
-        import_action.triggered.connect(self.importJson)
-        export_action.triggered.connect(self.exportJson)
+        compare_action.triggered.connect(self.compare_requirements)
+        merge_action.triggered.connect(self.merge_requirements)
+        template_action.triggered.connect(self.requirement_template)
+        import_action.triggered.connect(self.import_requirements)
+        export_action.triggered.connect(self.export_requirements)
 
-    def compare(self):
+    def compare_requirements(self):
         QMessageBox.information(self, "Compare", "Logic here.")
 
-    def merge(self):
+    def merge_requirements(self):
         QMessageBox.information(self, "Merge", "Logic here.")
 
-    def template(self):
+    def requirement_template(self):
         QMessageBox.information(self, "Template", "Logic here.")
 
-    def importJson(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "Open Requirements", "", "JSON Files (*.json)")
+    def import_requirements(self):
+        filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
 
-        if filename:
+        if filepath:
             try:
-                with open(filename, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
+                data = FileOperations.read_file(filepath)
+                title, author, requirements = FileOperations.dictionary_to_table(data)
 
-                title = data.get("title", "Untitled")
-                author = data.get("author", "Unknown")
-                requirements = data.get("requirementList", [])
-
-                # Create new tab with imported data
                 tab = RequirementSection(title, author)
-
-                # Fill table with requirements
                 tab.table.setRowCount(len(requirements))
-                for row_index, req in enumerate(requirements):
-                    req_id = req.get("requirementID", "")
-                    req_text = req.get("requirement", "")
-                    tab.table.setItem(row_index, 0, QTableWidgetItem(req_id))
-                    tab.table.setItem(row_index, 1, QTableWidgetItem(req_text))
+                for row, item in enumerate(requirements):
+                    tab.table.setItem(row, 0, QTableWidgetItem(item.get("requirementID", "")))
+                    tab.table.setItem(row, 1, QTableWidgetItem(item.get("requirement", "")))
 
+                # MAY HAVE SIMILAR ISSUE IN TABSECTION, ADD TAB
                 self.tab_widget.insertTab(self.tab_widget.count() - 1, tab, title)
                 self.tab_widget.setCurrentWidget(tab)
 
-                QMessageBox.information(self, "Import Successful", f"Imported tab '{title}' with {len(requirements)} items.")
+                QMessageBox.information(self, "Import Successful", f"Imported {len(requirements)} requirements.")
 
             except Exception as e:
-                QMessageBox.critical(self, "Import Failed", f"Error: {e}")
+                QMessageBox.critical(self, "Import Failed", f"Error: {e}")   
 
-    def exportJson(self):
-        filename, _ = QFileDialog.getSaveFileName(self, "Save Requirements", "", "JSON Files (*.json)")
+    def export_requirements(self):
+        filepath, _ = QFileDialog.getSaveFileName(self, "Save Requirements", "", "JSON Files (*.json)")
 
-        if filename:
-            current_widget = self.tab_widget.currentWidget()
-
-            if isinstance(current_widget, RequirementSection):
-                data = current_widget.to_dictionary()
-
-                with open(filename, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
-
-                QMessageBox.information(self.window, "Exported", f"Exported current list to {filename}")
+        if filepath:
+            widget = self.tab_widget.currentWidget()
+            if isinstance(widget, RequirementSection):
+                data = FileOperations.table_to_dictionary(widget.title, widget.author, widget.get_table_contents())
+                FileOperations.write_file(filepath, data)
+                QMessageBox.information(self, "Export Successful", f"Exported to {filepath}")
             else:
-                QMessageBox.warning(self.window, "Export Error", "Error")
+                QMessageBox.warning(self, "Export Error", "Not a requirement tab!")
+        
 
 

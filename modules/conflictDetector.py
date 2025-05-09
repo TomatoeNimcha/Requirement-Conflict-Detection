@@ -1,6 +1,9 @@
 from PySide6.QtGui import QColor, QBrush
-from spacyImplementation import SpacyImplementation
-class conflictDetection:
+
+from modules.spacyImplementation import SpacyImplementation
+
+
+class ConflictDetector:
     def __init__(self):
         self.spacy = SpacyImplementation()
 
@@ -8,9 +11,9 @@ class conflictDetection:
     def detect_conflict(self,table_contents=[]):
     # Note that anything that needs spacy is directly implemented in spacyImplementation
     # Not a nerd but its so only need to call the large package and english nlp once
-        self.conflicts_redundancy = []
-        self.conflicts_similarity = []
-        self.conflicts_contradiction = []
+        conflicts_redundancy = []
+        conflicts_similarity = []
+        conflicts_contradiction = []
 
         # Compare pairs
         for i in range(len(table_contents)):
@@ -20,14 +23,14 @@ class conflictDetection:
                 similarity = self.spacy.spacy_similarity(text1, text2)
 
                 if self.spacy.redundancy_check(similarity):
-                    self.conflicts_redundancy.append((row1, row2))
-                elif self.spacy.similarity_check(similarity):
-                    self.conflicts_similarity.append((row1, row2))
-                elif self.spacy.contradiction_check(similarity, text1, text2):
-                    self.conflicts_contradiction.append((row1, row2))
+                    conflicts_redundancy.append((row1, row2))
+                if self.spacy.similarity_check(similarity):
+                    conflicts_similarity.append((row1, row2))
+                if self.spacy.contradiction_check(similarity, text1, text2):
+                    conflicts_contradiction.append((row1, row2))
 
         return {
-            "redundancy": self.conflicts_redundancy,
-            "similarity": self.conflicts_similarity,
-            "contradiction": self.conflicts_contradiction
+            "redundancy": conflicts_redundancy,
+            "similarity": conflicts_similarity,
+            "contradiction": conflicts_contradiction
         }

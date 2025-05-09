@@ -6,8 +6,8 @@ from PySide6.QtCore import Qt
 
 from PySide6.QtGui import QColor, QBrush
 
-import json
-from modules.spacyImplementation import SpacyImplementation
+
+from modules.conflictDetector import ConflictDetector
 from ui.warningsection import WarningSection
 
 class RequirementSection(QWidget):
@@ -57,9 +57,11 @@ class RequirementSection(QWidget):
         # Logic
         add_button.clicked.connect(self.add_row)
         remove_button.clicked.connect(self.remove_row)
-        check_button.clicked.connect(self.check_conflict)
+        check_button.clicked.connect(self.show_conflicts)
 
         self.setLayout(layout)
+
+        self.conflict_detector = ConflictDetector()
 
     def add_row(self):
         self.table.insertRow(self.table.rowCount())
@@ -68,7 +70,6 @@ class RequirementSection(QWidget):
         selected = self.table.currentRow()
         if selected >= 0:
             self.table.removeRow(selected)
-
 
     def get_table_contents(self):
         table_contents = []
@@ -84,32 +85,20 @@ class RequirementSection(QWidget):
                 table_contents.append((row, req_id, req_text))
 
         return table_contents
-
-    def to_dictionary(self):
-        requirementList = []
-
-        for row in range(self.table.rowCount()):
-            requirementID_item = self.table.item(row, 0)
-            requirement_item = self.table.item(row, 1)
-
-            requirementID = requirementID_item.text() if requirementID_item else ""
-            requirement = requirement_item.text() if requirement_item else ""
-
-            # Skip empty rows
-            if requirementID.strip() or requirement.strip():
-                requirementList.append({
-                    "requirementID": requirementID,
-                    "requirement": requirement
-                })
-
-        return {
-            "title": self.title,
-            "author": self.author,
-            "requirementList": requirementList
-        }
     
+    def get_title(self):
+        return self.title
+    
+    def get_author(self):
+        return self.author
 
-    def highlight_rows(self,row_pairs, color):
+    def get_conflict_from_table(self):
+        table_contents = self.get_table_contents()
+        conflicts = ConflictDetector.detect_conflict(table_contents)
+
+        return conflicts
+
+    def highlight_rows(self, row_pairs, color):
         for row1, row2 in row_pairs:
             for col in range(self.table.columnCount()):
                 item1 = self.table.item(row1, col)
@@ -120,47 +109,16 @@ class RequirementSection(QWidget):
                     item2.setBackground(QColor(color))
 
 
-    def check_conflict(self):
-        spacy_checker = SpacyImplementation()
-        conflicts_redundancy = []
-        conflicts_similarity = []
-        conflicts_contradiction = []
+    def show_conflicts(self, WarningSection):
+        conflicts = self.get_conflict_from_table()
 
-        # Clear previous highlights
-        for row in range(self.table.rowCount()):
-            for col in range(self.table.columnCount()):
-                item = self.table.item(row, col)
-                if item:
-                    item.setBackground(QBrush(Qt.NoBrush))  
+        self.highlight_rows(conflicts["redundancy"], "red")
+        self.highlight_rows(conflicts["similarity"], "yellow")
+        self.highlight_rows(conflicts["contradiction"], "orange")
 
-        # Gather all valid requirements
-        requirements = []
-        for row in range(self.table.rowCount()):
-            id_item = self.table.item(row, 0)
-            req_item = self.table.item(row, 1)
+        WarningSection.conflict_warning(conflicts)
 
-            if id_item and req_item:
-                req_id = id_item.text().strip()
-                req_text = req_item.text().strip()
-                if req_id and req_text:
-                    requirements.append((row, req_id, req_text))
+        
+    
 
-        # Compare all pairs
-        for i in range(len(requirements)):
-            row1, id1, text1 = requirements[i]
-            for j in range(i + 1, len(requirements)):
-                row2, id2, text2 = requirements[j]
-
-                similarity = spacy_checker.spacy_similarity(text1,text2)
-
-                if spacy_checker.redundancy_check(similarity) == True:
-                    conflicts_redundancy.append((row1, row2))
-                elif spacy_checker.similarity_check(similarity) == True:
-                    conflicts_similarity.append((row1, row2))
-                elif spacy_checker.contradiction_check(similarity,text1,text2) == True:
-                    conflicts_contradiction.append((row1, row2))
-
-        self.highlight_rows(conflicts_redundancy, "red")
-        self.highlight_rows(conflicts_similarity, "yellow")
-        self.highlight_rows(conflicts_contradiction, "orange")
-
+    
