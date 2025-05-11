@@ -61,8 +61,6 @@ class RequirementSection(QWidget):
 
         self.setLayout(layout)
 
-        self.conflict_detector = ConflictDetector()
-
     def add_row(self):
         self.table.insertRow(self.table.rowCount())
 
@@ -93,8 +91,10 @@ class RequirementSection(QWidget):
         return self.author
 
     def get_conflict_from_table(self):
+        conflict_detector = ConflictDetector()
+
         table_contents = self.get_table_contents()
-        conflicts = ConflictDetector.detect_conflict(table_contents)
+        conflicts = conflict_detector.detect_conflict(table_contents)
 
         return conflicts
 
@@ -109,14 +109,12 @@ class RequirementSection(QWidget):
                     item2.setBackground(QColor(color))
 
 
-    def show_conflicts(self, WarningSection):
+    def show_conflicts(self):
         conflicts = self.get_conflict_from_table()
 
         self.highlight_rows(conflicts["redundancy"], "red")
         self.highlight_rows(conflicts["similarity"], "yellow")
         self.highlight_rows(conflicts["contradiction"], "orange")
-
-        WarningSection.conflict_warning(conflicts)
 
         
     

@@ -26,6 +26,13 @@ class WarningSection(QWidget):
 
     def add_dummy_warning(self):
         self.add_warning("Warning: Requirement Conflict Found!")
+        self.conflict_warning(
+            {
+            "redundancy" : [[0,1]],
+            "similarity": [[2,3]],
+            "contradiction": [[4,5]]
+        }
+        )
 
 
     def clear_warnings(self):
@@ -54,11 +61,11 @@ class WarningSection(QWidget):
         layout.addWidget(label)
         self.warning_layout.addWidget(bubble)
 
-    def conflict_warning(self,conflicts=[]):
+    def conflict_warning(self,conflicts={}):
         self.clear_warnings()
         for pair in conflicts["redundancy"]:
-            self.add_warning(f"Redundant: Row {pair[0]} and {pair[1]}")
+            self.add_warning(f"Redundancy: Row {pair[0]} and {pair[1]}")
         for pair in conflicts["similarity"]:
-            self.add_warning(f"Similar: Row {pair[0]} and {pair[1]}")
+            self.add_warning(f"Similarity: Row {pair[0]} and {pair[1]}")
         for pair in conflicts["contradiction"]:
             self.add_warning(f"Contradiction: Row {pair[0]} and {pair[1]}")

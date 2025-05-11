@@ -11,7 +11,7 @@ class TabSection(QTabWidget):
         super().__init__()
 
         self.setStyleSheet("QTabBar::tab { height: 30px; padding: 8px; }")
-        self.setTabsClosable(False)
+        self.setTabsClosable(True)
 
         # Add initial tabs
         self.add_requirement_tab("List 2")
@@ -23,6 +23,7 @@ class TabSection(QTabWidget):
 
         # Watch for tab changes
         self.currentChanged.connect(self.user_add_requirement_tab)
+        self.tabCloseRequested.connect(self.close_tab)
 
 
     def user_add_requirement_tab(self, index):
@@ -43,4 +44,11 @@ class TabSection(QTabWidget):
         tab = RequirementSection(tab_name)
         self.insertTab(index, tab, tab_name)
         self.setCurrentIndex(index)
+
+    def close_tab(self, index):
+        # Prevent closing the "+" tab
+        if self.widget(index) == self.plus_tab:
+            return
+
+        self.removeTab(index)
 
