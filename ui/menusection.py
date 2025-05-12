@@ -1,12 +1,13 @@
 from PySide6.QtWidgets import (
     QWidget, QFileDialog, QMenuBar, QMessageBox,
     QLabel, QTableWidget, QTableWidgetItem, QPushButton,
-    QDialog, QFormLayout, QLineEdit, QSpinBox, QDialogButtonBox
+    QDialog, QFormLayout, QLineEdit, QSpinBox, QDialogButtonBox, QInputDialog
 )
 
 from ui.tabsection import TabSection
 from ui.requirementsection import RequirementSection
 from modules.fileOperations import FileOperations
+from data.template import template
 
 class MenuSection(QWidget):
     def __init__(self, window, tab_widget):
@@ -75,27 +76,38 @@ class MenuSection(QWidget):
                 QMessageBox.warning(self, "Export Error", "Not a requirement tab!")
 
     def requirement_template(self):
-        filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
+        # Available templates mapped to their variable names
+        templates = {
+            "Regular Template": "regular_template",
+            "Functional Web App Template": "func_web_template",
+            "Non-functional Web App Template": "nonfunc_web_template"
+        }
 
-        if filepath:
-            try:
-                data = FileOperations.read_file(filepath)
-                title, author, requirements = FileOperations.dictionary_to_table(data)
+        # Ask user to select one
+        options = list(templates.keys())
+        selected_label, ok = QInputDialog.getItem(self, "Choose Template", "Select a requirement template:", options, 0, False)
 
-                tab = RequirementSection(title, author)
-                tab.table.setRowCount(len(requirements))
-                for row, item in enumerate(requirements):
-                    tab.table.setItem(row, 0, QTableWidgetItem(item.get("requirementID", "")))
-                    tab.table.setItem(row, 1, QTableWidgetItem(item.get("requirement", "")))
+        if not ok or not selected_label:
+            return  # Cancelled          
+              
+        try:
+            data =  getattr(template, templates[selected_label])
+            title, author, requirements = FileOperations.dictionary_to_table(data)
 
-                # MAY HAVE SIMILAR ISSUE IN TABSECTION, ADD TAB
-                self.tab_widget.insertTab(self.tab_widget.count() - 1, tab, title)
-                self.tab_widget.setCurrentWidget(tab)
+            tab = RequirementSection(title, author)
+            tab.table.setRowCount(len(requirements))
+            for row, item in enumerate(requirements):
+                tab.table.setItem(row, 0, QTableWidgetItem(item.get("requirementID", "")))
+                tab.table.setItem(row, 1, QTableWidgetItem(item.get("requirement", "")))
 
-                QMessageBox.information(self, "Import Template Successful", f"Imported {len(requirements)} requirements.")
+            # MAY HAVE SIMILAR ISSUE IN TABSECTION, ADD TAB
+            self.tab_widget.insertTab(self.tab_widget.count() - 1, tab, title)
+            self.tab_widget.setCurrentWidget(tab)
 
-            except Exception as e:
-                QMessageBox.critical(self, "Import Template Failed", f"Error: {e}")   
+            QMessageBox.information(self, "Import Template Successful", f"Imported {len(requirements)} requirements.")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Import Template Failed", f"Error: {e}")   
 
 
     def compare_requirements(self):
