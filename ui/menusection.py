@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import (
     QWidget, QFileDialog, QMenuBar, QMessageBox,
-    QLabel, QTableWidget, QTableWidgetItem, QPushButton
+    QLabel, QTableWidget, QTableWidgetItem, QPushButton,
+    QDialog, QFormLayout, QLineEdit, QSpinBox, QDialogButtonBox
 )
 
 from ui.tabsection import TabSection
@@ -17,29 +18,26 @@ class MenuSection(QWidget):
         self.create_menus()
 
     def create_menus(self):
-        settings_menu = self.menu_bar.addMenu("&Options")
+        file_menu = self.menu_bar.addMenu("&File")
+        import_action = file_menu.addAction("Import")
+        export_action = file_menu.addAction("Export")
+        template_action = file_menu.addAction("Template")
 
-        compare_action = settings_menu.addAction("Compare Lists")
-        merge_action = settings_menu.addAction("Merge Lists")
-        template_action = settings_menu.addAction("Template")
-        import_action = settings_menu.addAction("Import")
-        export_action = settings_menu.addAction("Export")
+        transform_menu = self.menu_bar.addMenu("&Modify")
+        compare_action = transform_menu.addAction("Compare Lists")
+        merge_action = transform_menu.addAction("Merge Lists")
+        identification_action = transform_menu.addAction("Auto Identification")
 
         # Connect actions to methods
-        compare_action.triggered.connect(self.compare_requirements)
-        merge_action.triggered.connect(self.merge_requirements)
-        template_action.triggered.connect(self.requirement_template)
         import_action.triggered.connect(self.import_requirements)
         export_action.triggered.connect(self.export_requirements)
+        template_action.triggered.connect(self.requirement_template)
 
-    def compare_requirements(self):
-        QMessageBox.information(self, "Compare", "Logic here.")
+        compare_action.triggered.connect(self.compare_requirements)
+        merge_action.triggered.connect(self.merge_requirements)
+        identification_action.triggered.connect(self.automatic_identification)
+        
 
-    def merge_requirements(self):
-        QMessageBox.information(self, "Merge", "Logic here.")
-
-    def requirement_template(self):
-        QMessageBox.information(self, "Template", "Logic here.")
 
     def import_requirements(self):
         filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
@@ -75,6 +73,119 @@ class MenuSection(QWidget):
                 QMessageBox.information(self, "Export Successful", f"Exported to {filepath}")
             else:
                 QMessageBox.warning(self, "Export Error", "Not a requirement tab!")
-        
+
+    def requirement_template(self):
+        filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
+
+        if filepath:
+            try:
+                data = FileOperations.read_file(filepath)
+                title, author, requirements = FileOperations.dictionary_to_table(data)
+
+                tab = RequirementSection(title, author)
+                tab.table.setRowCount(len(requirements))
+                for row, item in enumerate(requirements):
+                    tab.table.setItem(row, 0, QTableWidgetItem(item.get("requirementID", "")))
+                    tab.table.setItem(row, 1, QTableWidgetItem(item.get("requirement", "")))
+
+                # MAY HAVE SIMILAR ISSUE IN TABSECTION, ADD TAB
+                self.tab_widget.insertTab(self.tab_widget.count() - 1, tab, title)
+                self.tab_widget.setCurrentWidget(tab)
+
+                QMessageBox.information(self, "Import Template Successful", f"Imported {len(requirements)} requirements.")
+
+            except Exception as e:
+                QMessageBox.critical(self, "Import Template Failed", f"Error: {e}")   
+
+
+    def compare_requirements(self):
+        QMessageBox.information(self, "Compare", "Logic here.")
+
+    def merge_requirements(self):
+        filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
+
+        if filepath:
+            try:
+                # Read and parse file
+                data = FileOperations.read_file(filepath)
+                title, author, requirements = FileOperations.dictionary_to_table(data)
+
+                tab = self.tab_widget.currentWidget()
+
+                if isinstance(tab, RequirementSection):
+                    table = tab.table
+                    current_rows = table.rowCount()
+                    new_rows = len(requirements)
+                    table.setRowCount(current_rows + new_rows)
+
+                    # Append new requirements
+                    for i, item in enumerate(requirements):
+                        row = current_rows + i
+                        table.setItem(row, 0, QTableWidgetItem(item.get("requirementID", "")))
+                        table.setItem(row, 1, QTableWidgetItem(item.get("requirement", "")))
+
+                    QMessageBox.information(self, "Merge Successful", f"Merged {new_rows} requirements into current tab.")
+
+            except Exception as e:
+                QMessageBox.critical(self, "Merge Failed Failed", f"Error: {e}") 
+
+    def automatic_identification(self):
+        current_tab = self.tab_widget.currentWidget()
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Auto ID Generator")
+        layout = QFormLayout(dialog)
+       
+        start_row = QSpinBox()
+        start_row.setMinimum(1)
+
+        end_row = QSpinBox()
+        end_row.setMinimum(1)
+
+        prefix = QLineEdit("REQ")
+        infix = QLineEdit("0001")
+        suffix = QLineEdit("")
+
+        layout.addRow("Start Row:", start_row)
+        layout.addRow("End Row:", end_row)
+        layout.addRow("Prefix:", prefix)
+        layout.addRow("Infix Format (e.g., 0001):", infix)
+        layout.addRow("Suffix:", suffix)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        layout.addWidget(buttons)
+
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        if dialog.exec() != QDialog.Accepted:
+            return
+
+        # Get user inputs
+        s_row = start_row.value() - 1
+        print(f'Start Row {s_row}')
+        e_row = end_row.value() 
+        print(f'End Row {e_row}')
+        pfx = prefix.text()
+        ifx = infix.text()
+        sfx = suffix.text()
+
+        try:
+            start_num = int(ifx)
+            num_digits = len(ifx)
+        except ValueError:
+            QMessageBox.warning(self, "Invalid Infix", "Infix must be numeric like '001' or '0007'.")
+            return
+
+        table = current_tab.table
+        max_row = table.rowCount()
+
+        if e_row > max_row or s_row > e_row:
+            QMessageBox.warning(self, "Invalid Row Range", f"Row range must be between 1 and {max_row}.")
+            return
+
+        # Generate and assign IDs
+        for row in range(s_row, e_row):
+            new_id = f"{pfx}{str(start_num).zfill(num_digits)}{sfx}"
+            table.setItem(row, 0, QTableWidgetItem(new_id))
+            start_num += 1
 
 

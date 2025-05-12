@@ -34,7 +34,7 @@ class SpacyImplementation:
     def similarity_check(self, similarity=0.0):
         print(f"Similarity: {similarity:.4f}")
 
-        if similarity > 0.9009 and similarity < 1.0: #Similarity index, the control of how similar it is
+        if similarity > 0.9490 and similarity < 1.0: #Similarity index, the control of how similar it is
             print("Similar")
             return True
             
@@ -48,7 +48,7 @@ class SpacyImplementation:
 
         print(f"Similarity: {similarity:.4f}")
 
-        if similarity > 0.9009 and similarity != 1.0:
+        if similarity > 0.9490 and similarity < 1.0:
             if has_neg1 != has_neg2:
                 print("Contradicticting")
                 return True

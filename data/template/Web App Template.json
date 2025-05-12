@@ -1,0 +1,106 @@
+{
+    "title": "Website Application Requirements",
+    "author": "Default Author",
+    "requirementList": [
+        {
+            "requirementID": "REQ-001",
+            "requirement": "The system shall allow users to register with a valid email and password."
+        },
+        {
+            "requirementID": "REQ-002",
+            "requirement": "The system shall allow users to log in and log out securely."
+        },
+        {
+            "requirementID": "REQ-003",
+            "requirement": "The system shall restrict access to features based on user roles (e.g., admin, regular user)."
+        },
+        {
+            "requirementID": "REQ-004",
+            "requirement": "The user shall be able to view and update their personal profile information."
+        },
+        {
+            "requirementID": "REQ-005",
+            "requirement": "The user shall be able to change their password."
+        },
+        {
+            "requirementID": "REQ-006",
+            "requirement": "The user shall be able to upload a profile picture."
+        },
+        {
+            "requirementID": "REQ-007",
+            "requirement": "The system shall display a personalized dashboard after user login."
+        },
+        {
+            "requirementID": "REQ-008",
+            "requirement": "The dashboard shall summarize key user data and provide shortcuts to frequently used features."
+        },
+        {
+            "requirementID": "REQ-009",
+            "requirement": "The user shall be able to create, view, update, and delete items such as posts, entries, or products."
+        },
+        {
+            "requirementID": "REQ-010",
+            "requirement": "The system shall validate input data before submission."
+        },
+        {
+            "requirementID": "REQ-011",
+            "requirement": "The user shall be able to search for content using a keyword-based search bar."
+        },
+        {
+            "requirementID": "REQ-012",
+            "requirement": "The user shall be able to filter results by predefined categories or attributes."
+        },
+        {
+            "requirementID": "REQ-013",
+            "requirement": "The system shall notify users of important events via real-time alerts or email."
+        },
+        {
+            "requirementID": "REQ-014",
+            "requirement": "The user shall be able to view past notifications from a notification center."
+        },
+        {
+            "requirementID": "REQ-015",
+            "requirement": "The user shall be able to submit forms with validated input fields"
+        },
+        {
+            "requirementID": "REQ-016",
+            "requirement": "The system shall allow users to upload files or documents where applicable."
+        },
+        {
+            "requirementID": "REQ-017",
+            "requirement": "The system shall integrate with third-party APIs (e.g., payment gateways, maps, social login)."
+        },
+        {
+            "requirementID": "REQ-018",
+            "requirement": "The system shall handle API errors gracefully."
+        },
+        {
+            "requirementID": "REQ-019",
+            "requirement": "The admin user shall be able to manage users, content, and system configurations."
+        },
+        {
+            "requirementID": "REQ-020",
+            "requirement": "The admin user shall be able to view usage reports and activity logs."
+        },
+        {
+            "requirementID": "REQ-021",
+            "requirement": "The user shall be able to export data in formats such as CSV or PDF."
+        },
+        {
+            "requirementID": "REQ-022",
+            "requirement": "The system shall allow importing data from structured files."
+        },
+        {
+            "requirementID": "REQ-023",
+            "requirement": "The system shall maintain a log of critical user and system activities for auditing purposes"
+        },
+        {
+            "requirementID": "REQ-024",
+            "requirement": "The system shall enforce role-based access permissions for different features and actions."
+        },
+        {
+            "requirementID": "REQ-025",
+            "requirement": "The admin user shall be able to assign and revoke roles to/from other users"
+        }
+    ]
+}

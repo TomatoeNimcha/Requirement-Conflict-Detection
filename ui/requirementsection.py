@@ -32,7 +32,7 @@ class RequirementSection(QWidget):
 
         # Table
         self.table = QTableWidget(5, 2)
-        self.table.setHorizontalHeaderLabels(["Requirement ID", "Requirement"])
+        self.table.setHorizontalHeaderLabels(["Requirement ID", "Requirement", "Attributes"])
         self.table.horizontalHeader().setStretchLastSection(True)
 
         # Example Table Contents
@@ -112,8 +112,8 @@ class RequirementSection(QWidget):
     def show_conflicts(self):
         conflicts = self.get_conflict_from_table()
 
-        self.highlight_rows(conflicts["redundancy"], "red")
         self.highlight_rows(conflicts["similarity"], "yellow")
+        self.highlight_rows(conflicts["redundancy"], "red")
         self.highlight_rows(conflicts["contradiction"], "orange")
 
         

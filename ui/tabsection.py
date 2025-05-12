@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QTableWidget, QTableWidgetItem, QPushButton,
-    QTabWidget, QWidget, QInputDialog
+    QTabWidget, QWidget, QInputDialog, QTabBar
 )
 
 from ui.requirementsection import RequirementSection
@@ -20,6 +20,8 @@ class TabSection(QTabWidget):
         # Add "+" tab
         self.plus_tab = QWidget()
         self.addTab(self.plus_tab, "+")
+        plus_index = self.indexOf(self.plus_tab)
+        self.tabBar().setTabButton(plus_index, QTabBar.RightSide, None)
 
         # Watch for tab changes
         self.currentChanged.connect(self.user_add_requirement_tab)

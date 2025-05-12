@@ -1,4 +1,5 @@
 
+import os
 import json
 
 class FileOperations:
@@ -34,4 +35,11 @@ class FileOperations:
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
+    def load_file(filename):
+        base_dir = os.path.dirname(os.path.abspath(__file__))  # Current file directory
+        template_path = os.path.join(base_dir, "data", "template", filename)
+
+        with open(template_path, "r", encoding="utf-8") as file:
+            data = json.load(file)
+            return data
     
