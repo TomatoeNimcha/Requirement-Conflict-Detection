@@ -69,7 +69,7 @@ class MenuSection(QWidget):
         if filepath:
             widget = self.tab_widget.currentWidget()
             if isinstance(widget, RequirementSection):
-                data = FileOperations.table_to_dictionary(widget.title, widget.author, widget.get_table_contents())
+                data = FileOperations.table_to_dictionary(widget.get_title(), widget.get_author(), widget.get_table_contents())
                 FileOperations.write_file(filepath, data)
                 QMessageBox.information(self, "Export Successful", f"Exported to {filepath}")
             else:

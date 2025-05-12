@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QTableWidget, QTableWidgetItem, QPushButton
+    QLabel, QTableWidget, QTableWidgetItem, QPushButton,QLineEdit
 )
 from PySide6.QtCore import Qt
 
@@ -20,15 +20,21 @@ class RequirementSection(QWidget):
         
         layout = QVBoxLayout()
 
-        # Label Title
-        title = QLabel(title)
-        title.setStyleSheet("font-weight: bold; font-size: 16px;")
-        layout.addWidget(title)
+        # Title
+        self.title = QLineEdit(title)
+        self.title.setStyleSheet("font-weight: bold; font-size: 16px; border: none;")
+        self.title.setReadOnly(True)
+        self.title.mouseDoubleClickEvent = lambda e: self.title.setReadOnly(False)
+        self.title.editingFinished.connect(lambda: self.title.setReadOnly(True))
+        layout.addWidget(self.title)
 
-        # Label Author
-        author = QLabel(author)
-        author.setStyleSheet("font-weight: thin; font-size: 10px;")
-        layout.addWidget(author)
+        # Author
+        self.author = QLineEdit(author)
+        self.author.setStyleSheet("font-weight: thin; font-size: 10px; border: none;")
+        self.author.setReadOnly(True)
+        self.author.mouseDoubleClickEvent = lambda e: self.author.setReadOnly(False)
+        self.author.editingFinished.connect(lambda: self.author.setReadOnly(True))
+        layout.addWidget(self.author)
 
         # Table
         self.table = QTableWidget(5, 2)
@@ -85,10 +91,10 @@ class RequirementSection(QWidget):
         return table_contents
     
     def get_title(self):
-        return self.title
+        return self.title.text()
     
     def get_author(self):
-        return self.author
+        return self.author.text()
 
     def get_conflict_from_table(self):
         conflict_detector = ConflictDetector()
@@ -115,6 +121,8 @@ class RequirementSection(QWidget):
         self.highlight_rows(conflicts["similarity"], "yellow")
         self.highlight_rows(conflicts["redundancy"], "red")
         self.highlight_rows(conflicts["contradiction"], "orange")
+
+        WarningSection.conflict_warning(conflicts)
 
         
     
