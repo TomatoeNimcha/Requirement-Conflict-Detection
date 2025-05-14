@@ -34,3 +34,6 @@ class ConflictDetector:
             "similarity": conflicts_similarity,
             "contradiction": conflicts_contradiction
         }
+    
+    # def total_confict(self, detect_conflict_result={}):
+

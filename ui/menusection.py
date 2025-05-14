@@ -171,18 +171,9 @@ class MenuSection(QWidget):
         if dialog.exec() != QDialog.Accepted:
             return
 
-        # Get user inputs
-        s_row = start_row.value() - 1
-        print(f'Start Row {s_row}')
-        e_row = end_row.value() 
-        print(f'End Row {e_row}')
-        pfx = prefix.text()
-        ifx = infix.text()
-        sfx = suffix.text()
-
         try:
-            start_num = int(ifx)
-            num_digits = len(ifx)
+            start_num = int(infix.text())
+            num_digits = len(infix.text())
         except ValueError:
             QMessageBox.warning(self, "Invalid Infix", "Infix must be numeric like '001' or '0007'.")
             return
@@ -190,13 +181,13 @@ class MenuSection(QWidget):
         table = current_tab.table
         max_row = table.rowCount()
 
-        if e_row > max_row or s_row > e_row:
+        if end_row.value() > max_row or start_row.value() > end_row.value():
             QMessageBox.warning(self, "Invalid Row Range", f"Row range must be between 1 and {max_row}.")
             return
 
         # Generate and assign IDs
-        for row in range(s_row, e_row):
-            new_id = f"{pfx}{str(start_num).zfill(num_digits)}{sfx}"
+        for row in range(start_row.value()-1, end_row.value()):
+            new_id = f"{prefix.text()}{str(start_num).zfill(num_digits)}{suffix.text()}"
             table.setItem(row, 0, QTableWidgetItem(new_id))
             start_num += 1
 

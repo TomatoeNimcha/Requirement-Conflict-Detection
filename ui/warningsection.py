@@ -1,7 +1,8 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QScrollArea, QFrame
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QScrollArea, QFrame, QSizePolicy
+from PySide6.QtCore import Qt, Signal, QObject
 
 class WarningSection(QWidget):
+    requirement_conflict_signal = Signal(dict)
     def __init__(self):
         super().__init__()
 
@@ -24,6 +25,8 @@ class WarningSection(QWidget):
         # Connect button to add dummy warning
         trigger_button.clicked.connect(self.add_dummy_warning)
 
+        self.requirement_conflict_signal.connect(self.conflict_warning)
+
     def add_dummy_warning(self):
         self.add_warning("Warning: Requirement Conflict Found!")
         self.conflict_warning(
@@ -45,28 +48,33 @@ class WarningSection(QWidget):
     def add_warning(self, text):
         bubble = QWidget()
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)  # remove outer padding
+        layout.setSpacing(0)
         bubble.setLayout(layout)
         
         label = QLabel(text)
         label.setWordWrap(True)
+        label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum) 
         label.setStyleSheet("""
-            background-color: #ffe6e6;
-            border: 1px solid #ff4d4d;
-            padding: 8px;
-            border-radius: 10px;
-            color: #990000;
-            font-weight: bold;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 8pt;
         """)
         
         layout.addWidget(label)
+        self.warning_layout.setAlignment(Qt.AlignTop)
         self.warning_layout.addWidget(bubble)
 
     def conflict_warning(self,conflicts={}):
-        #self.clear_warnings()
-        print("This works but it didn't add dem layout")
-        for pair in conflicts["similarity"]:
-            self.add_warning(f"Similarity: Row {pair[0]} and {pair[1]}")
-        for pair in conflicts["redundancy"]:
-            self.add_warning(f"Redundancy: Row {pair[0]} and {pair[1]}")
-        for pair in conflicts["contradiction"]:
-            self.add_warning(f"Contradiction: Row {pair[0]} and {pair[1]}")
+        self.clear_warnings()
+        print("This is conflict warning")
+        print(conflicts)
+
+        if conflicts!={}: #This is done to avoid str warning
+            for pair in conflicts["similarity"]:
+                self.add_warning(f"🟡 Similarity: Row {pair[0]+1} and {pair[1]+1}")
+            for pair in conflicts["redundancy"]:
+                self.add_warning(f"🔴 Redundancy: Row {pair[0]+1} and {pair[1]+1}")
+            for pair in conflicts["contradiction"]:
+                self.add_warning(f"🟠 Contradiction: Row {pair[0]+1} and {pair[1]+1}")

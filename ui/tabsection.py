@@ -7,15 +7,16 @@ from PySide6.QtWidgets import (
 from ui.requirementsection import RequirementSection
 
 class TabSection(QTabWidget):
-    def __init__(self):
+    def __init__(self, warning_widget):
         super().__init__()
+
+        self.warning_widget = warning_widget
 
         self.setStyleSheet("QTabBar::tab { height: 30px; padding: 8px; }")
         self.setTabsClosable(True)
 
         # Add initial tabs
-        self.add_requirement_tab("List 2")
-        self.add_requirement_tab("List 1")
+        self.add_requirement_tab("Requirement List")
 
         # Add "+" tab
         self.plus_tab = QWidget()
@@ -26,7 +27,6 @@ class TabSection(QTabWidget):
         # Watch for tab changes
         self.currentChanged.connect(self.user_add_requirement_tab)
         self.tabCloseRequested.connect(self.close_tab)
-
 
     def user_add_requirement_tab(self, index):
         if self.tabText(index) == "+":
@@ -43,9 +43,9 @@ class TabSection(QTabWidget):
     def add_requirement_tab(self, title=None, author=None):
         index = self.count() - 1  # always insert before "+" tab
         tab_name = title if title else f"List {index + 1}"
-        tab = RequirementSection(tab_name)
+        tab = RequirementSection(self.warning_widget,tab_name)
         self.insertTab(index, tab, tab_name)
-        self.setCurrentIndex(index)
+        self.setCurrentIndex(index)  
 
     def close_tab(self, index):
         # Prevent closing the "+" tab
@@ -53,4 +53,8 @@ class TabSection(QTabWidget):
             return
 
         self.removeTab(index)
+
+
+
+
 

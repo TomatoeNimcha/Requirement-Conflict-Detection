@@ -17,9 +17,13 @@ class MainWindow(QMainWindow):
         #For some reason QMainWindow need central widget to make layout work 
         central_widget = QWidget() 
         layout = QGridLayout()
+
+        # ____WARNING SECTION____
+        warning_widget = WarningSection()
+        layout.addWidget(warning_widget, 1, 1)
         
         # ____TAB SECTION____
-        tab_widget = TabSection()
+        tab_widget = TabSection(warning_widget)
         layout.addWidget(tab_widget, 1, 0, 1, 1)
 
         # ____MENU SECTION____
@@ -28,12 +32,8 @@ class MainWindow(QMainWindow):
 
         # --- CENTER REQUIREMENT TABLE AREA ---
         # center_widget = RequirementSection()
-        # layout.addWidget(center_widget, 1, 0)
-        
+        # layout.addWidget(center_widget, 1, 0)   
 
-        # ____WARNING SECTION____
-        warning_widget = WarningSection()
-        layout.addWidget(warning_widget, 1, 1)
 
         # Set column stretches: left wider than right
         layout.setColumnStretch(0, 3)  # main content area

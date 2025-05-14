@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QTableWidget, QTableWidgetItem, QPushButton,QLineEdit
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal, QObject
 
 from PySide6.QtGui import QColor, QBrush
 
@@ -11,10 +11,11 @@ from modules.conflictDetector import ConflictDetector
 from ui.warningsection import WarningSection
 
 class RequirementSection(QWidget):
-    def __init__(self,title="Default Title",author="Default Author", warning_section=None):
+    def __init__(self,warning_widget, title="Default Title",author="Default Author"):
         super().__init__()
 
-        # Declare variables so it is editable later on
+        # Declare variables so it is editable later on\
+        self.warning_widget = warning_widget
         self.title = title
         self.author = author
         
@@ -37,15 +38,17 @@ class RequirementSection(QWidget):
         layout.addWidget(self.author)
 
         # Table
-        self.table = QTableWidget(5, 2)
+        self.table = QTableWidget(10, 3)
         self.table.setHorizontalHeaderLabels(["Requirement ID", "Requirement", "Attributes"])
+        self.table.setColumnWidth(0, 100) #ID
+        self.table.setColumnWidth(1, 325) #Requirement
+        #self.table.setColumnWidth(2, 100) #Attributes, useless because it stretches to the right anyways
         self.table.horizontalHeader().setStretchLastSection(True)
+        
 
         # Example Table Contents
         self.table.setItem(0, 0, QTableWidgetItem("REQ-001"))
         self.table.setItem(0, 1, QTableWidgetItem("User can log in"))
-        self.table.setItem(1, 0, QTableWidgetItem("REQ-002"))
-        self.table.setItem(1, 1, QTableWidgetItem("User can log out"))
         layout.addWidget(self.table)
 
         # Buttons
@@ -103,6 +106,13 @@ class RequirementSection(QWidget):
         conflicts = conflict_detector.detect_conflict(table_contents)
 
         return conflicts
+    
+    def clear_highlights(self):
+        for row in range(self.table.rowCount()):
+            for col in range(self.table.columnCount()):
+                item = self.table.item(row, col)
+                if item:
+                    item.setBackground(QColor(Qt.transparent))
 
     def highlight_rows(self, row_pairs, color):
         for row1, row2 in row_pairs:
@@ -116,13 +126,17 @@ class RequirementSection(QWidget):
 
 
     def show_conflicts(self):
+        self.clear_highlights()
         conflicts = self.get_conflict_from_table()
 
         self.highlight_rows(conflicts["similarity"], "yellow")
         self.highlight_rows(conflicts["redundancy"], "red")
         self.highlight_rows(conflicts["contradiction"], "orange")
 
-        WarningSection.conflict_warning(conflicts)
+        self.warning_widget.conflict_warning(conflicts)
+
+
+
 
         
     
