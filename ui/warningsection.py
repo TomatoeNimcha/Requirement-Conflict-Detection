@@ -78,3 +78,6 @@ class WarningSection(QWidget):
                 self.add_warning(f"🔴 Redundancy: Row {pair[0]+1} and {pair[1]+1}")
             for pair in conflicts["contradiction"]:
                 self.add_warning(f"🟠 Contradiction: Row {pair[0]+1} and {pair[1]+1}")
+
+        if conflicts == {"redundancy": [], "similarity": [], "contradiction": []}:
+            self.add_warning("🟢 No conflict detected.")
