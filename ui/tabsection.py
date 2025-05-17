@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QTableWidget, QTableWidgetItem, QPushButton,
-    QTabWidget, QWidget, QInputDialog, QTabBar
+    QTabWidget, QWidget, QInputDialog, QTabBar, QMessageBox
 )
 
 from ui.requirementsection import RequirementSection
@@ -16,7 +16,7 @@ class TabSection(QTabWidget):
         self.setTabsClosable(True)
 
         # Add initial tabs
-        self.add_requirement_tab("Requirement List")
+        self.add_requirement_tab(title="Requirement List")
 
         # Add "+" tab
         self.plus_tab = QWidget()
@@ -36,14 +36,14 @@ class TabSection(QTabWidget):
             if not ok or not name.strip():
                 self.setCurrentIndex(0)            
             else:
-                self.add_requirement_tab(name)
+                self.add_requirement_tab(title=name)
 
 
     # ISSUE : THIS WONT WORK UNLESS THERES AN INITIAL TAB BEFORE
     def add_requirement_tab(self, title=None, author=None):
         index = self.count() - 1  # always insert before "+" tab
         tab_name = title if title else f"List {index + 1}"
-        tab = RequirementSection(self.warning_widget,tab_name)
+        tab = RequirementSection(warning_widget=self.warning_widget,title=tab_name)
         self.insertTab(index, tab, tab_name)
         self.setCurrentIndex(index)  
 
@@ -51,10 +51,21 @@ class TabSection(QTabWidget):
         # Prevent closing the "+" tab
         if self.widget(index) == self.plus_tab:
             return
-
         self.removeTab(index)
 
+        if self.count() == 1 and self.widget(0) == self.plus_tab:
+            # Show confirmation dialog
+            confirm = QMessageBox.question(
+                self,
+                "Exit Application?",
+                "Do you want to exit the application?",
+                QMessageBox.Yes | QMessageBox.No
+            )
 
+            if confirm == QMessageBox.Yes:
+                self.window().close()
+            else :
+                self.add_requirement_tab(title="Requirement List")
 
 
 

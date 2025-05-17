@@ -7,11 +7,12 @@ class FileOperations:
     def table_to_dictionary(title="",author="",table_contents=[]):
         requirement_list = []
 
-        for _, req_id, req_text in table_contents:
+        for _, req_id, req_text, req_att in table_contents:
             if req_id or req_text:
                 requirement_list.append({
                     "requirementID": req_id,
-                    "requirement": req_text
+                    "requirement": req_text,
+                    "attributes" : req_att
                 })
 
         return {

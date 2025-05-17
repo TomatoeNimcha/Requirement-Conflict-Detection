@@ -11,6 +11,15 @@ class SpacyImplementation:
         self.negative_keywords = ["must not", "should not", "cannot", "never", "no", "not allowed"]
 
 
+    def is_spacy_running(self):
+        doc = "This is to test if Spacy can be run."
+        try:
+            doc = self.nlp(doc)
+            print("Spacy is running.")
+        except:
+            print("Spacy fails to run.")
+
+
     def spacy_similarity(self,sentence1="", sentence2=""):
         print(f"{sentence1} vs {sentence2}")
         sentence1 = self.nlp(sentence1)

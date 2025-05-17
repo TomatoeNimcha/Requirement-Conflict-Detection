@@ -10,6 +10,7 @@ from ui.menusection import MenuSection
 class MainWindow(QMainWindow):
     def __init__(self,app):
         super().__init__()
+
         self.app = app
         self.setWindowTitle("Requirements Conflict Detection Software")
 
@@ -27,7 +28,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(tab_widget, 1, 0, 1, 1)
 
         # ____MENU SECTION____
-        self.menu = MenuSection(self,tab_widget)
+        self.menu = MenuSection(self,tab_widget,warning_widget)
 
 
         # --- CENTER REQUIREMENT TABLE AREA ---

@@ -10,10 +10,11 @@ from modules.fileOperations import FileOperations
 from data.template import template
 
 class MenuSection(QWidget):
-    def __init__(self, window, tab_widget):
+    def __init__(self, window, tab_widget, warning_widget):
         super().__init__()
         self.window = window
         self.tab_widget = tab_widget
+        self.warning_widget = warning_widget
         self.menu_bar = self.window.menuBar()
 
         self.create_menus()
@@ -48,11 +49,11 @@ class MenuSection(QWidget):
                 data = FileOperations.read_file(filepath)
                 title, author, requirements = FileOperations.dictionary_to_table(data)
 
-                tab = RequirementSection(title, author)
+                tab = RequirementSection(warning_widget=self.warning_widget,title=title, author=author)
                 tab.table.setRowCount(len(requirements))
                 for row, item in enumerate(requirements):
-                    tab.table.setItem(row, 0, QTableWidgetItem(item.get("requirementID", "")))
-                    tab.table.setItem(row, 1, QTableWidgetItem(item.get("requirement", "")))
+                    tab.table.setItem(row, 0, QTableWidgetItem(str(item.get("requirementID", ""))))
+                    tab.table.setItem(row, 1, QTableWidgetItem(str(item.get("requirement", ""))))
 
                 # MAY HAVE SIMILAR ISSUE IN TABSECTION, ADD TAB
                 self.tab_widget.insertTab(self.tab_widget.count() - 1, tab, title)
@@ -94,7 +95,7 @@ class MenuSection(QWidget):
             data =  getattr(template, templates[selected_label])
             title, author, requirements = FileOperations.dictionary_to_table(data)
 
-            tab = RequirementSection(title, author)
+            tab = RequirementSection(warning_widget=self.warning_widget,title=title, author=author)
             tab.table.setRowCount(len(requirements))
             for row, item in enumerate(requirements):
                 tab.table.setItem(row, 0, QTableWidgetItem(item.get("requirementID", "")))
@@ -133,8 +134,8 @@ class MenuSection(QWidget):
                     # Append new requirements
                     for i, item in enumerate(requirements):
                         row = current_rows + i
-                        table.setItem(row, 0, QTableWidgetItem(item.get("requirementID", "")))
-                        table.setItem(row, 1, QTableWidgetItem(item.get("requirement", "")))
+                        table.setItem(row, 0, QTableWidgetItem(str(item.get("requirementID", ""))))
+                        table.setItem(row, 1, QTableWidgetItem(str(item.get("requirement", ""))))
 
                     QMessageBox.information(self, "Merge Successful", f"Merged {new_rows} requirements into current tab.")
 

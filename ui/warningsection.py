@@ -9,9 +9,9 @@ class WarningSection(QWidget):
         main_layout = QVBoxLayout()
         self.setLayout(main_layout)
 
-        # Temporary button
-        trigger_button = QPushButton("Trigger Warning")
-        main_layout.addWidget(trigger_button)
+        # # Temporary button
+        # trigger_button = QPushButton("Trigger Warning")
+        # main_layout.addWidget(trigger_button)
 
         # Scroll area for warning messages
         scroll = QScrollArea()
@@ -22,20 +22,20 @@ class WarningSection(QWidget):
         scroll.setWidget(scroll_frame)
         main_layout.addWidget(scroll)
 
-        # Connect button to add dummy warning
-        trigger_button.clicked.connect(self.add_dummy_warning)
+        # # Connect button to add dummy warning
+        # trigger_button.clicked.connect(self.add_dummy_warning)
 
         self.requirement_conflict_signal.connect(self.conflict_warning)
 
-    def add_dummy_warning(self):
-        self.add_warning("Warning: Requirement Conflict Found!")
-        self.conflict_warning(
-            {
-            "redundancy" : [[0,1]],
-            "similarity": [[2,3]],
-            "contradiction": [[4,5]]
-        }
-        )
+    # def add_dummy_warning(self):
+    #     self.add_warning("Warning: Requirement Conflict Found!")
+    #     self.conflict_warning(
+    #         {
+    #         "redundancy" : [[0,1]],
+    #         "similarity": [[2,3]],
+    #         "contradiction": [[4,5]]
+    #     }
+    #     )
 
 
     def clear_warnings(self):
@@ -45,7 +45,7 @@ class WarningSection(QWidget):
                 child.widget().deleteLater()
 
 
-    def add_warning(self, text):
+    def add_warning(self, text, type=None):
         bubble = QWidget()
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)  # remove outer padding
@@ -55,12 +55,21 @@ class WarningSection(QWidget):
         label = QLabel(text)
         label.setWordWrap(True)
         label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum) 
-        label.setStyleSheet("""
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 4px 8px;
-            font-size: 8pt;
-        """)
+
+        if type == 1:
+            label.setStyleSheet("""
+                border-radius: 4px;
+                padding: 4px 8px;
+                font-size: 8pt;
+            """)
+            
+        else:
+            label.setStyleSheet("""
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 4px 8px;
+                font-size: 8pt;
+            """)
         
         layout.addWidget(label)
         self.warning_layout.setAlignment(Qt.AlignTop)
@@ -71,13 +80,21 @@ class WarningSection(QWidget):
         print("This is conflict warning")
         print(conflicts)
 
-        if conflicts!={}: #This is done to avoid str warning
-            for pair in conflicts["similarity"]:
-                self.add_warning(f"🟡 Similarity: Row {pair[0]+1} and {pair[1]+1}")
-            for pair in conflicts["redundancy"]:
-                self.add_warning(f"🔴 Redundancy: Row {pair[0]+1} and {pair[1]+1}")
-            for pair in conflicts["contradiction"]:
-                self.add_warning(f"🟠 Contradiction: Row {pair[0]+1} and {pair[1]+1}")
+        conflict_type = ["similarity", "redundancy", "contradiction"]
+        total = sum(len(conflicts.get(key, [])) for key in conflict_type)
 
-        if conflicts == {"redundancy": [], "similarity": [], "contradiction": []}:
+        if total > 0:
+            self.add_warning(f"{total} conflicts found!", 1)
+
+            for x in conflict_type:
+                for (row1, id1), (row2, id2) in conflicts.get(x, []):
+                    label1 = id1 if id1 else f"Row {row1 + 1}"
+                    label2 = id2 if id2 else f"Row {row2 + 1}"
+                    if x == "similarity":
+                        self.add_warning(f"🟡 Similarity: {label1} and {label2}")
+                    if x == "redundancy":
+                        self.add_warning(f"🔴 Redundancy: {label1} and {label2}")
+                    if x == "contradiction":
+                        self.add_warning(f"🟠 Contradiction: {label1} and {label2}")
+        else:
             self.add_warning("🟢 No conflict detected.")

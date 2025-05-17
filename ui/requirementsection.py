@@ -11,13 +11,14 @@ from modules.conflictDetector import ConflictDetector
 from ui.warningsection import WarningSection
 
 class RequirementSection(QWidget):
-    def __init__(self,warning_widget, title="Default Title",author="Default Author"):
+    def __init__(self, warning_widget, title="Default Title",author="Default Author"):
         super().__init__()
 
-        # Declare variables so it is editable later on\
-        self.warning_widget = warning_widget
+        # Declare variables so it is editable later on
+        self.warning_widget = warning_widget     
         self.title = title
         self.author = author
+        self.conflict_detector = ConflictDetector()
         
         layout = QVBoxLayout()
 
@@ -100,12 +101,11 @@ class RequirementSection(QWidget):
         return self.author.text()
 
     def get_conflict_from_table(self):
-        conflict_detector = ConflictDetector()
-
         table_contents = self.get_table_contents()
-        conflicts = conflict_detector.detect_conflict(table_contents)
+        conflicts = self.conflict_detector.detect_conflict(table_contents)
 
         return conflicts
+
     
     def clear_highlights(self):
         for row in range(self.table.rowCount()):
@@ -129,9 +129,9 @@ class RequirementSection(QWidget):
         self.clear_highlights()
         conflicts = self.get_conflict_from_table()
 
-        self.highlight_rows(conflicts["similarity"], "yellow")
-        self.highlight_rows(conflicts["redundancy"], "red")
-        self.highlight_rows(conflicts["contradiction"], "orange")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"]), "yellow")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["redundancy"]), "red")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"]), "orange")
 
         self.warning_widget.conflict_warning(conflicts)
 
