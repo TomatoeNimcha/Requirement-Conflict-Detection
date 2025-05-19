@@ -8,7 +8,7 @@ class FileOperations:
         requirement_list = []
 
         for _, req_id, req_text, req_att in table_contents:
-            if req_id or req_text:
+            if req_id or req_text or req_att:
                 requirement_list.append({
                     "requirementID": req_id,
                     "requirement": req_text,

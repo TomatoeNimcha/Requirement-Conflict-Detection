@@ -7,10 +7,11 @@ from PySide6.QtWidgets import (
 from ui.requirementsection import RequirementSection
 
 class TabSection(QTabWidget):
-    def __init__(self, warning_widget):
+    def __init__(self, warning_widget, conflict_detector):
         super().__init__()
 
         self.warning_widget = warning_widget
+        self.conflict_detector = conflict_detector
 
         self.setStyleSheet("QTabBar::tab { height: 30px; padding: 8px; }")
         self.setTabsClosable(True)
@@ -43,7 +44,7 @@ class TabSection(QTabWidget):
     def add_requirement_tab(self, title=None, author=None):
         index = self.count() - 1  # always insert before "+" tab
         tab_name = title if title else f"List {index + 1}"
-        tab = RequirementSection(warning_widget=self.warning_widget,title=tab_name)
+        tab = RequirementSection(self.warning_widget,self.conflict_detector,title=tab_name)
         self.insertTab(index, tab, tab_name)
         self.setCurrentIndex(index)  
 

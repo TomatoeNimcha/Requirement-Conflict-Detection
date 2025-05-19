@@ -6,6 +6,7 @@ from ui.requirementsection import RequirementSection
 from ui.warningsection import WarningSection
 from ui.tabsection import TabSection
 from ui.menusection import MenuSection
+from modules.conflictDetector import ConflictDetector
 
 class MainWindow(QMainWindow):
     def __init__(self,app):
@@ -13,6 +14,7 @@ class MainWindow(QMainWindow):
 
         self.app = app
         self.setWindowTitle("Requirements Conflict Detection Software")
+        self.conflict_detector = ConflictDetector()
 
         # ____LAYOUT____
         #For some reason QMainWindow need central widget to make layout work 
@@ -24,11 +26,11 @@ class MainWindow(QMainWindow):
         layout.addWidget(warning_widget, 1, 1)
         
         # ____TAB SECTION____
-        tab_widget = TabSection(warning_widget)
+        tab_widget = TabSection(warning_widget,self.conflict_detector)
         layout.addWidget(tab_widget, 1, 0, 1, 1)
 
         # ____MENU SECTION____
-        self.menu = MenuSection(self,tab_widget,warning_widget)
+        self.menu = MenuSection(self,tab_widget,warning_widget,self.conflict_detector)
 
 
         # --- CENTER REQUIREMENT TABLE AREA ---

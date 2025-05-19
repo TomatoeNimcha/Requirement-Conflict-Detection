@@ -10,11 +10,12 @@ from modules.fileOperations import FileOperations
 from data.template import template
 
 class MenuSection(QWidget):
-    def __init__(self, window, tab_widget, warning_widget):
+    def __init__(self, window, tab_widget, warning_widget, conflict_detector):
         super().__init__()
         self.window = window
         self.tab_widget = tab_widget
         self.warning_widget = warning_widget
+        self.conflict_detector = conflict_detector
         self.menu_bar = self.window.menuBar()
 
         self.create_menus()
@@ -49,13 +50,13 @@ class MenuSection(QWidget):
                 data = FileOperations.read_file(filepath)
                 title, author, requirements = FileOperations.dictionary_to_table(data)
 
-                tab = RequirementSection(warning_widget=self.warning_widget,title=title, author=author)
+                tab = RequirementSection(self.warning_widget,self.conflict_detector,title=title, author=author)
                 tab.table.setRowCount(len(requirements))
                 for row, item in enumerate(requirements):
                     tab.table.setItem(row, 0, QTableWidgetItem(str(item.get("requirementID", ""))))
                     tab.table.setItem(row, 1, QTableWidgetItem(str(item.get("requirement", ""))))
+                    tab.table.setItem(row, 2, QTableWidgetItem(str(item.get("attributes", ""))))
 
-                # MAY HAVE SIMILAR ISSUE IN TABSECTION, ADD TAB
                 self.tab_widget.insertTab(self.tab_widget.count() - 1, tab, title)
                 self.tab_widget.setCurrentWidget(tab)
 
@@ -95,7 +96,7 @@ class MenuSection(QWidget):
             data =  getattr(template, templates[selected_label])
             title, author, requirements = FileOperations.dictionary_to_table(data)
 
-            tab = RequirementSection(warning_widget=self.warning_widget,title=title, author=author)
+            tab = RequirementSection(self.warning_widget,self.conflict_detector,title=title, author=author)
             tab.table.setRowCount(len(requirements))
             for row, item in enumerate(requirements):
                 tab.table.setItem(row, 0, QTableWidgetItem(item.get("requirementID", "")))
@@ -110,9 +111,58 @@ class MenuSection(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Import Template Failed", f"Error: {e}")   
 
-
     def compare_requirements(self):
-        QMessageBox.information(self, "Compare", "Logic here.")
+        # Ask user which tab to compare with
+        current_index = self.tab_widget.currentIndex()
+        plus_tab_index = self.tab_widget.count() - 1
+        
+        # Remove current tab from the list can't compare with itself)(
+        compare_options = [
+            self.tab_widget.tabText(i)
+            for i in range(self.tab_widget.count())
+            if i != current_index and i != plus_tab_index
+        ]
+        compare_indices = [
+            i
+            for i in range(self.tab_widget.count())
+            if i != current_index and i != plus_tab_index
+        ]
+
+        if not compare_options:
+            QMessageBox.warning(self, "No Tabs Available", "There are no other tabs to compare with.")
+            return
+
+        selected_tab_name, ok = QInputDialog.getItem(
+            self,
+            "Compare Requirements",
+            "Select a tab to compare with:",
+            compare_options,
+            editable=False
+        )
+
+        if not ok:
+            return
+
+        selected_index = compare_indices[compare_options.index(selected_tab_name)]
+
+        # Step 2: Identify Tab A and Tab B
+        tab_A = self.tab_widget.widget(current_index)
+        tab_B = self.tab_widget.widget(selected_index)
+
+        # Step 3: Get combined content
+        contents_A = tab_A.get_table_contents()
+        contents_B = tab_B.get_table_contents()
+        combined_contents = contents_A + contents_B  # Or do a smarter merge if needed
+
+        # Step 4: Run conflict detection
+        conflicts = self.conflict_detector.detect_conflict(combined_contents)
+
+        # Step 5: Highlight conflicts in both tables
+        tab_A.show_combined_conflicts(conflicts)
+        tab_B.show_combined_conflicts(conflicts)
+
+
+
 
     def merge_requirements(self):
         filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
@@ -136,6 +186,7 @@ class MenuSection(QWidget):
                         row = current_rows + i
                         table.setItem(row, 0, QTableWidgetItem(str(item.get("requirementID", ""))))
                         table.setItem(row, 1, QTableWidgetItem(str(item.get("requirement", ""))))
+                        table.setItem(row, 2, QTableWidgetItem(str(item.get("attributes", ""))))
 
                     QMessageBox.information(self, "Merge Successful", f"Merged {new_rows} requirements into current tab.")
 

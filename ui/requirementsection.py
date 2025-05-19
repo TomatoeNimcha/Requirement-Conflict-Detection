@@ -3,22 +3,20 @@ from PySide6.QtWidgets import (
     QLabel, QTableWidget, QTableWidgetItem, QPushButton,QLineEdit
 )
 from PySide6.QtCore import Qt, Signal, QObject
-
 from PySide6.QtGui import QColor, QBrush
 
-
-from modules.conflictDetector import ConflictDetector
 from ui.warningsection import WarningSection
+from ui.tagsection import TagSection
 
 class RequirementSection(QWidget):
-    def __init__(self, warning_widget, title="Default Title",author="Default Author"):
+    def __init__(self, warning_widget, conflict_detector, title="Default Title",author="Default Author"):
         super().__init__()
 
         # Declare variables so it is editable later on
         self.warning_widget = warning_widget     
         self.title = title
         self.author = author
-        self.conflict_detector = ConflictDetector()
+        self.conflict_detector = conflict_detector
         
         layout = QVBoxLayout()
 
@@ -46,10 +44,12 @@ class RequirementSection(QWidget):
         #self.table.setColumnWidth(2, 100) #Attributes, useless because it stretches to the right anyways
         self.table.horizontalHeader().setStretchLastSection(True)
         
-
+        tags = [("important", "#ff6b6b"), ("non-functional", "#0d6efd")]
+        
         # Example Table Contents
         self.table.setItem(0, 0, QTableWidgetItem("REQ-001"))
         self.table.setItem(0, 1, QTableWidgetItem("User can log in"))
+        self.table.setCellWidget(0, 2, TagSection(tags))
         layout.addWidget(self.table)
 
         # Buttons
@@ -85,12 +85,14 @@ class RequirementSection(QWidget):
         for row in range(self.table.rowCount()):
             id_item = self.table.item(row, 0)
             req_item = self.table.item(row, 1)
+            att_item = self.table.item(row, 2)
 
             req_id = id_item.text().strip() if id_item else ""
             req_text = req_item.text().strip() if req_item else ""
+            req_att = att_item.text().strip() if att_item else ""
 
             if req_id or req_text:
-                table_contents.append((row, req_id, req_text))
+                table_contents.append((row, req_id, req_text, req_att))
 
         return table_contents
     
@@ -127,11 +129,22 @@ class RequirementSection(QWidget):
 
     def show_conflicts(self):
         self.clear_highlights()
+
         conflicts = self.get_conflict_from_table()
 
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"]), "yellow")
         self.highlight_rows(self.conflict_detector.extract_rows(conflicts["redundancy"]), "red")
         self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"]), "orange")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"]), "yellow")
+
+        self.warning_widget.conflict_warning(conflicts)
+
+
+    def show_combined_conflicts(self, conflicts):
+        self.clear_highlights()
+
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["redundancy"]), "red")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"]), "orange")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"]), "yellow")
 
         self.warning_widget.conflict_warning(conflicts)
 

@@ -8,7 +8,8 @@ class SpacyImplementation:
         # load english(large) package
         self.nlp = spacy.load("en_core_web_lg")
 
-        self.negative_keywords = ["must not", "should not", "cannot", "never", "no", "not allowed"]
+        self.negative_keywords = ["must not", "should not", "cannot", "never", "no", "not allowed", "not"]
+        self.vague_keywords = ["maybe", "may", "could", "some"]
 
 
     def is_spacy_running(self):

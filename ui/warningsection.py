@@ -2,7 +2,6 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QScroll
 from PySide6.QtCore import Qt, Signal, QObject
 
 class WarningSection(QWidget):
-    requirement_conflict_signal = Signal(dict)
     def __init__(self):
         super().__init__()
 
@@ -24,8 +23,6 @@ class WarningSection(QWidget):
 
         # # Connect button to add dummy warning
         # trigger_button.clicked.connect(self.add_dummy_warning)
-
-        self.requirement_conflict_signal.connect(self.conflict_warning)
 
     # def add_dummy_warning(self):
     #     self.add_warning("Warning: Requirement Conflict Found!")
@@ -98,3 +95,5 @@ class WarningSection(QWidget):
                         self.add_warning(f"🟠 Contradiction: {label1} and {label2}")
         else:
             self.add_warning("🟢 No conflict detected.")
+
+    # def solve_conflict(self, conflict={}):
