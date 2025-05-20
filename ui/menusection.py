@@ -161,9 +161,6 @@ class MenuSection(QWidget):
         tab_A.show_combined_conflicts(conflicts)
         tab_B.show_combined_conflicts(conflicts)
 
-
-
-
     def merge_requirements(self):
         filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
 

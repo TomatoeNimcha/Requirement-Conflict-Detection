@@ -78,6 +78,9 @@ class RequirementSection(QWidget):
         selected = self.table.currentRow()
         if selected >= 0:
             self.table.removeRow(selected)
+    
+    def remove_conflict_row(self, row):
+        self.table.removeRow(row)
 
     def get_table_contents(self):
         table_contents = []

@@ -17,17 +17,17 @@ class ConflictDetector:
 
         # Compare pairs
         for i in range(len(table_contents)):
-            row1, id1, text1, attribute1 = table_contents[i]
+            row1, id1, req1, attribute1 = table_contents[i]
             for j in range(i + 1, len(table_contents)):
-                row2, id2, text2, attribute2 = table_contents[j]
+                row2, id2, req2, attribute2 = table_contents[j]
 
-                similarity = self.spacy.spacy_similarity(text1, text2)
-                pair = ((row1, id1), (row2, id2))
+                similarity = self.spacy.spacy_similarity(req1, req2)
+                pair = ((row1, id1, req1), (row2, id2, req2))
 
                 if self.spacy.redundancy_check(similarity):
                     conflicts_redundancy.append(pair)
                 if self.spacy.similarity_check(similarity):    
-                    if self.spacy.contradiction_check(similarity, text1, text2):
+                    if self.spacy.contradiction_check(similarity, req1, req2):
                         conflicts_contradiction.append(pair)
                     else:
                         conflicts_similarity.append(pair)
@@ -40,14 +40,16 @@ class ConflictDetector:
         }
     
     def total_confict(self, detect_conflict_result={}):
-        total = len(detect_conflict_result.get("redundancy", [])) + len(detect_conflict_result.get("similarity", [])) + len(detect_conflict_result.get("contradiction", []))
-        return total
+        return len(detect_conflict_result.get("redundancy", [])) + len(detect_conflict_result.get("similarity", [])) + len(detect_conflict_result.get("contradiction", []))
     
     def extract_rows(self, conflict_list):
         return [(a[0], b[0]) for a, b in conflict_list]
         
     def extract_ids(self, conflict_list):
         return [(a[1], b[1]) for a, b in conflict_list]
+
+    def extract_reqs(self, conflict_list):
+        return [(a[2], b[2]) for a, b in conflict_list]
 
     
     

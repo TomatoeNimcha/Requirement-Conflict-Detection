@@ -22,11 +22,12 @@ class MainWindow(QMainWindow):
         layout = QGridLayout()
 
         # ____WARNING SECTION____
-        warning_widget = WarningSection()
+        warning_widget = WarningSection(None)
         layout.addWidget(warning_widget, 1, 1)
         
         # ____TAB SECTION____
         tab_widget = TabSection(warning_widget,self.conflict_detector)
+        warning_widget.set_tab_widget(tab_widget)
         layout.addWidget(tab_widget, 1, 0, 1, 1)
 
         # ____MENU SECTION____
