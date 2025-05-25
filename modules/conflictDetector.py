@@ -9,19 +9,38 @@ class ConflictDetector:
         self.spacy.is_spacy_running()
 
     def detect_conflict(self,table_contents=[]):
-    # Note that anything that needs spacy is directly implemented in spacyImplementation
-    # Not a nerd but its so only need to call the large package and english nlp once
         conflicts_redundancy = []
         conflicts_similarity = []
         conflicts_contradiction = []
+        conflicts_ambiguity = []
 
-        # Compare pairs
+        # STEP 1: Preprocess and cache Spacy Docs
+        docs = []
+        for _, _, req, _ in table_contents:
+            if not req.strip():
+                docs.append(None)
+            else:
+                docs.append(self.spacy.get_nlp(req))
+
         for i in range(len(table_contents)):
-            row1, id1, req1, attribute1 = table_contents[i]
-            for j in range(i + 1, len(table_contents)):
-                row2, id2, req2, attribute2 = table_contents[j]
+            row, id_, req, _ = table_contents[i]
+            if self.spacy.ambiguity_check(req):
+                conflicts_ambiguity.append((row, id_, req))
 
-                similarity = self.spacy.spacy_similarity(req1, req2)
+        # STEP 2: Compare only valid pairs
+        for i in range(len(table_contents)):
+            row1, id1, req1, _ = table_contents[i]
+            doc1 = docs[i]
+            if doc1 is None:
+                continue
+
+            for j in range(i + 1, len(table_contents)):
+                row2, id2, req2, _ = table_contents[j]
+                doc2 = docs[j]
+                if doc2 is None:
+                    continue
+
+                similarity = self.spacy.spacy_similarity(doc1, doc2)
                 pair = ((row1, id1, req1), (row2, id2, req2))
 
                 if self.spacy.redundancy_check(similarity):
@@ -32,24 +51,40 @@ class ConflictDetector:
                     else:
                         conflicts_similarity.append(pair)
 
-        #conflict list with row and id
         return {
             "redundancy": conflicts_redundancy,
             "similarity": conflicts_similarity,
-            "contradiction": conflicts_contradiction
+            "contradiction": conflicts_contradiction,
+            "ambiguity" : conflicts_ambiguity
         }
     
     def total_confict(self, detect_conflict_result={}):
-        return len(detect_conflict_result.get("redundancy", [])) + len(detect_conflict_result.get("similarity", [])) + len(detect_conflict_result.get("contradiction", []))
-    
-    def extract_rows(self, conflict_list):
-        return [(a[0], b[0]) for a, b in conflict_list]
+        total = len(detect_conflict_result.get("redundancy", [])) 
+        total += len(detect_conflict_result.get("similarity", [])) 
+        total += len(detect_conflict_result.get("contradiction", [])) 
+        total += len(detect_conflict_result.get("ambiguity", [])) 
+        return total
         
-    def extract_ids(self, conflict_list):
-        return [(a[1], b[1]) for a, b in conflict_list]
+    def extract_rows(self, conflict_list, num):
+        if num == 2 :
+            return [(a[0], b[0]) for a, b in conflict_list]
+        else:
+            return [a[0] for a in conflict_list]
+        
+    def extract_ids(self, conflict_list, num):
+        if num == 2 :
+            return [(a[1], b[1]) for a, b in conflict_list]
+        else:
+            return [a[1] for a in conflict_list]
 
-    def extract_reqs(self, conflict_list):
-        return [(a[2], b[2]) for a, b in conflict_list]
+    def extract_reqs(self, conflict_list, num):
+        if num == 2 :
+            return [(a[2], b[2]) for a, b in conflict_list]
+        else:
+            return [a[2] for a in conflict_list]
+    
+    def progress(self, current, total):
+        return int((current / total) * 100)
 
     
     

@@ -1,8 +1,9 @@
 
+from modules.spacyImplementation import SpacyImplementation
 
 class ConflictSolver:
     def __init__(self):
-        pass
+        self.spacy = SpacyImplementation()
 
     # Note, item is a pair of conflict
     # item = ((row,id,requirement),(row,id,requirement))
@@ -34,6 +35,9 @@ class ConflictSolver:
 
     def solve_contradiction(self, item1=None, item2=None, choice=None):
         return self.resolve_by_choice(item1, item2, choice)
+    
+    def solve_ambiguity(self, sentence):
+        return self.spacy.replace_vague_with_strong(sentence)
     
     def seperate_items(self,conflict_pair=(),item_num=None):
         item1, item2 = conflict_pair

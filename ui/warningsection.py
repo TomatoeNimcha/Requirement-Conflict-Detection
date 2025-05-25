@@ -144,6 +144,13 @@ class WarningSection(QWidget):
                         self.add_warning("🟡 Similarity", f"{label1} and {label2}", f"{label1} and {label2} are too similar!", conflict_type, item1, item2)
                     elif conflict_type == "contradiction":
                         self.add_warning("🟠 Contradiction", f"{label1} and {label2}", f"{label1} and {label2} contradict each other!", conflict_type, item1, item2)
+
+            for conflict_item in conflicts.get("ambiguity", []):
+                row_item, id_item, req_item = conflict_item
+
+                label = id_item if id_item else f"Row {row_item + 1}"
+                if conflict_type == "ambiguity":
+                    self.add_warning("🟤 Ambiguity", f"{label1}", f"{label} is using ambiguous word(s)!", conflict_type, conflict_item)
         else:
             self.add_status("🟢 No conflict detected.")
 
@@ -158,13 +165,13 @@ class WarningSection(QWidget):
         msg.setWindowTitle("Resolve Conflict")
         msg.setText(
             f"Which requirement do you want to keep?\n\n"
-            f"Option A (Row {row1 + 1}):\n{id1 or '(No ID)'}\n{req1}\n\n"
-            f"Option B (Row {row2 + 1}):\n{id2 or '(No ID)'}\n{req2}"
+            f"Option A: \nRow {row1 + 1}\n{id1 or '(No ID)'}\n{req1}\n\n"
+            f"Option B: \nRow {row2 + 1}\n{id2 or '(No ID)'}\n{req2}"
         )
         msg.setIcon(QMessageBox.Question)
 
-        btn_a = msg.addButton(f"Keep Row {row1 + 1}", QMessageBox.AcceptRole)
-        btn_b = msg.addButton(f"Keep Row {row2 + 1}", QMessageBox.RejectRole)
+        btn_a = msg.addButton(f"Keep A", QMessageBox.AcceptRole)
+        btn_b = msg.addButton(f"Keep B", QMessageBox.RejectRole)
         msg.addButton(QMessageBox.Cancel)
 
         msg.exec_()
@@ -180,7 +187,6 @@ class WarningSection(QWidget):
 
         # Resolve conflict
         result = self.conflict_solver.solve_conflict(warning_type, item1, item2, choice)
-        print("Result:", result)
 
         if result is not None:
             kept_row, kept_id, kept_req = result
@@ -193,6 +199,6 @@ class WarningSection(QWidget):
                     current_section.remove_conflict_row(to_remove[0])
                     current_section.show_conflicts()
         else:
-            self.add_status("⚠️ Could not resolve conflict.")
+            self.add_status("Could not resolve conflict.")
 
 

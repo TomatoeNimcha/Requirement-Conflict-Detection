@@ -1,12 +1,11 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout,
+    QWidget, QVBoxLayout, QHBoxLayout, QApplication,
     QLabel, QTableWidget, QTableWidgetItem, QPushButton,QLineEdit
 )
-from PySide6.QtCore import Qt, Signal, QObject
+from PySide6.QtCore import Qt, Signal, QObject, QTimer
 from PySide6.QtGui import QColor, QBrush
 
 from ui.warningsection import WarningSection
-from ui.tagsection import TagSection
 
 class RequirementSection(QWidget):
     def __init__(self, warning_widget, conflict_detector, title="Default Title",author="Default Author"):
@@ -38,18 +37,17 @@ class RequirementSection(QWidget):
 
         # Table
         self.table = QTableWidget(10, 3)
-        self.table.setHorizontalHeaderLabels(["Requirement ID", "Requirement", "Attributes"])
+        self.table.setHorizontalHeaderLabels(["Requirement ID", "Requirement", "Notes"])
         self.table.setColumnWidth(0, 100) #ID
         self.table.setColumnWidth(1, 325) #Requirement
         #self.table.setColumnWidth(2, 100) #Attributes, useless because it stretches to the right anyways
         self.table.horizontalHeader().setStretchLastSection(True)
         
-        tags = [("important", "#ff6b6b"), ("non-functional", "#0d6efd")]
         
         # Example Table Contents
         self.table.setItem(0, 0, QTableWidgetItem("REQ-001"))
         self.table.setItem(0, 1, QTableWidgetItem("User can log in"))
-        self.table.setCellWidget(0, 2, TagSection(tags))
+        self.table.setItem(0, 2, QTableWidgetItem("Functional Requirement"))
         layout.addWidget(self.table)
 
         # Buttons
@@ -106,6 +104,13 @@ class RequirementSection(QWidget):
         return self.author.text()
 
     def get_conflict_from_table(self):
+        print("This is get conflcit from table")
+        # This doesn't even show up and process events only made it slightly better
+        # BUT I AM NOT DOING THREADS, I REFUSE TO
+        self.warning_widget.add_status("Detecting conflicts . . . ")
+        
+        # QApplication.processEvents()
+
         table_contents = self.get_table_contents()
         conflicts = self.conflict_detector.detect_conflict(table_contents)
 
@@ -119,25 +124,35 @@ class RequirementSection(QWidget):
                 if item:
                     item.setBackground(QColor(Qt.transparent))
 
-    def highlight_rows(self, row_pairs, color):
-        for row1, row2 in row_pairs:
-            for col in range(self.table.columnCount()):
-                item1 = self.table.item(row1, col)
-                item2 = self.table.item(row2, col)
-                if item1:
-                    item1.setBackground(QColor(color))
-                if item2:
-                    item2.setBackground(QColor(color))
-
+    def highlight_rows(self, rows, color):
+        for entry in rows:
+            if isinstance(entry, tuple) and len(entry) == 2:
+                # Pair of rows (e.g., redundancy)
+                row1, row2 = entry
+                for col in range(self.table.columnCount()):
+                    item1 = self.table.item(row1, col)
+                    item2 = self.table.item(row2, col)
+                    if item1:
+                        item1.setBackground(QColor(color))
+                    if item2:
+                        item2.setBackground(QColor(color))
+            elif isinstance(entry, int):
+                # Single row (e.g., ambiguity)
+                for col in range(self.table.columnCount()):
+                    item = self.table.item(entry, col)
+                    if item:
+                        item.setBackground(QColor(color))
 
     def show_conflicts(self):
         self.clear_highlights()
 
         conflicts = self.get_conflict_from_table()
 
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["redundancy"]), "red")
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"]), "orange")
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"]), "yellow")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["redundancy"], 2), "fireBrick")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"], 2), "orangeRed")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"], 2), "goldenRod")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["ambiguity"], 1), "indigo")
+
 
         self.warning_widget.conflict_warning(conflicts)
 
@@ -145,9 +160,10 @@ class RequirementSection(QWidget):
     def show_combined_conflicts(self, conflicts):
         self.clear_highlights()
 
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["redundancy"]), "red")
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"]), "orange")
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"]), "yellow")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["redundancy"], 2), "red")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"], 2), "orange")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"], 2), "yellow")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["ambiguity"], 1), "purple")
 
         self.warning_widget.conflict_warning(conflicts)
 
