@@ -70,15 +70,26 @@ class RequirementSection(QWidget):
         self.setLayout(layout)
 
     def add_row(self):
-        self.table.insertRow(self.table.rowCount())
+        selected = self.table.currentRow()
+        if selected >= 0:
+            self.table.insertRow(selected + 1)
+        else:
+            self.table.insertRow(self.table.rowCount())
 
     def remove_row(self):
         selected = self.table.currentRow()
         if selected >= 0:
             self.table.removeRow(selected)
+        else:
+            self.table.removeRow(self.table.rowCount())
     
     def remove_conflict_row(self, row):
         self.table.removeRow(row)
+
+    def update_row_text(self, row_index, new_text):
+        table = self.table  # or self.tableWidget or however you refer to it
+        if 0 <= row_index < table.rowCount():
+            table.setItem(row_index, 1, QTableWidgetItem(new_text)) 
 
     def get_table_contents(self):
         table_contents = []
@@ -115,6 +126,18 @@ class RequirementSection(QWidget):
         conflicts = self.conflict_detector.detect_conflict(table_contents)
 
         return conflicts
+    
+    def search_table(self, text_to_find):
+        table = self.table 
+        matches = []
+
+        for row in range(table.rowCount()):
+            for col in range(table.columnCount()):
+                item = table.item(row, col)
+                if item and text_to_find.lower() in item.text().lower():
+                    matches.append((row, col))
+
+        return matches
 
     
     def clear_highlights(self):

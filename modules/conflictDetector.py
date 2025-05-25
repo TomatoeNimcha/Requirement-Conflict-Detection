@@ -69,7 +69,9 @@ class ConflictDetector:
         if num == 2 :
             return [(a[0], b[0]) for a, b in conflict_list]
         else:
+            print (a[0] for a in conflict_list)
             return [a[0] for a in conflict_list]
+        
         
     def extract_ids(self, conflict_list, num):
         if num == 2 :

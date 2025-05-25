@@ -26,10 +26,12 @@ class MenuSection(QWidget):
         export_action = file_menu.addAction("Export")
         template_action = file_menu.addAction("Template")
 
-        transform_menu = self.menu_bar.addMenu("&Modify")
-        compare_action = transform_menu.addAction("Compare Lists")
-        merge_action = transform_menu.addAction("Merge Lists")
-        identification_action = transform_menu.addAction("Auto Identification")
+        modify_menu = self.menu_bar.addMenu("&Modify")
+        compare_action = modify_menu.addAction("Compare Lists")
+        merge_action = modify_menu.addAction("Merge Lists")
+        identification_action = modify_menu.addAction("Auto Identification")
+
+        search_action = self.menu_bar.addAction("&Search")
 
         # Connect actions to methods
         import_action.triggered.connect(self.import_requirements)
@@ -39,6 +41,8 @@ class MenuSection(QWidget):
         compare_action.triggered.connect(self.compare_requirements)
         merge_action.triggered.connect(self.merge_requirements)
         identification_action.triggered.connect(self.automatic_identification)
+
+        search_action.triggered.connect(self.search)
         
 
 
@@ -239,5 +243,32 @@ class MenuSection(QWidget):
             new_id = f"{prefix.text()}{str(start_num).zfill(num_digits)}{suffix.text()}"
             table.setItem(row, 0, QTableWidgetItem(new_id))
             start_num += 1
+
+    def search(self):
+        # Ask the user for search text
+        current_tab = self.tab_widget.currentWidget()
+
+        text, ok = QInputDialog.getText(self, "Search Table", "Enter text to search:")
+
+        if ok and text:
+            current_tab.clear_highlights()
+            matches = current_tab.search_table(text)
+
+            if matches:
+                table = current_tab.table  
+                for row, col in matches:
+                    item = table.item(row, col)
+                    item.setSelected(True)
+                    table.scrollToItem(item)
+                    current_tab.highlight_rows([row], "darkBlue")
+            else:
+                QMessageBox.information(self, "Search Result", "No matches found.")
+
+
+
+
+# class RightClickMenuSection(QWidget):
+#     def __init__(self, window, tab_widget, warning_widget, conflict_detector):
+#         super().__init__()
 
 

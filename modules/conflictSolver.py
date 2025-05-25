@@ -16,6 +16,8 @@ class ConflictSolver:
             return self.solve_similarity(item1, item2, choice)
         elif conflict_type == "contradiction":
             return self.solve_contradiction(item1, item2, choice)
+        elif conflict_type == "ambiguity":
+            return self.solve_ambiguity(item1[2])
         else:
             return None
 

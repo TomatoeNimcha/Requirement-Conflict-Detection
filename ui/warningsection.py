@@ -47,8 +47,6 @@ class WarningSection(QWidget):
             warning.setParent(None)
             warning.deleteLater()
 
-
-
     def add_warning(self, warning_type, text1="Top", text2="Desc", conflict_type=None, item1=None, item2=None):
         bubble = QWidget()
         bubble.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
@@ -118,18 +116,18 @@ class WarningSection(QWidget):
         self.warning_layout.setAlignment(Qt.AlignTop)
         self.warning_layout.addWidget(bubble)
 
-    def conflict_warning(self,conflicts={},table=None):
+    def conflict_warning(self, conflicts={}, table=None):
         self.clear_warnings()
         print("This is conflict warning")
         print(conflicts)
 
-        conflict_type = ["similarity", "redundancy", "contradiction"]
-        total = sum(len(conflicts.get(key, [])) for key in conflict_type)
+        conflict_types = ["similarity", "redundancy", "contradiction"]
+        total = sum(len(conflicts.get(key, [])) for key in conflict_types)
 
-        if total > 0:
-            self.add_status(f"{total} conflict(s) found!")
+        if total > 0 or conflicts.get("ambiguity"):
+            self.add_status(f"{total} conflict(s) found!" if total else "")
 
-            for conflict_type in conflict_type:
+            for conflict_type in conflict_types:
                 for conflict_pair in conflicts.get(conflict_type, []):
                     item1, item2 = conflict_pair
                     row1, id1, req1 = item1
@@ -139,66 +137,106 @@ class WarningSection(QWidget):
                     label2 = id2 if id2 else f"Row {row2 + 1}"
 
                     if conflict_type == "redundancy":
-                        self.add_warning("🔴 Redundancy", f"{label1} and {label2}", f"{label1} and {label2} are the same requirement!\nRemove one of them.", conflict_type, item1, item2)
+                        self.add_warning("🔴 Redundancy", f"{label1} and {label2}",
+                                        f"{label1} and {label2} are the same requirement!\nRemove one of them.",
+                                        conflict_type, item1, item2)
                     elif conflict_type == "similarity":
-                        self.add_warning("🟡 Similarity", f"{label1} and {label2}", f"{label1} and {label2} are too similar!", conflict_type, item1, item2)
+                        self.add_warning("🟡 Similarity", f"{label1} and {label2}",
+                                        f"{label1} and {label2} are too similar!",
+                                        conflict_type, item1, item2)
                     elif conflict_type == "contradiction":
-                        self.add_warning("🟠 Contradiction", f"{label1} and {label2}", f"{label1} and {label2} contradict each other!", conflict_type, item1, item2)
+                        self.add_warning("🟠 Contradiction", f"{label1} and {label2}",
+                                        f"{label1} and {label2} contradict each other!",
+                                        conflict_type, item1, item2)
 
             for conflict_item in conflicts.get("ambiguity", []):
                 row_item, id_item, req_item = conflict_item
-
                 label = id_item if id_item else f"Row {row_item + 1}"
-                if conflict_type == "ambiguity":
-                    self.add_warning("🟤 Ambiguity", f"{label1}", f"{label} is using ambiguous word(s)!", conflict_type, conflict_item)
+                self.add_warning("🟤 Ambiguity", f"{label}", f"{label} is using ambiguous word(s)!",
+                                "ambiguity", conflict_item)
         else:
             self.add_status("🟢 No conflict detected.")
 
-    def solve_warning(self, warning_type, item1, item2):
-        row1, id1, req1 = item1
-        row2, id2, req2 = item2
+    def solve_warning(self, warning_type=None, item1=None, item2=None):
+        # Single-item conflict (e.g., ambiguity)
+        if item2 is None:
+            row_item, id_item, req_item = item1
+            print(f"Fixing {warning_type.lower()} conflict of Row {row_item + 1}")
 
-        print(f"Fixing {warning_type.lower()} conflict between Row {row1 + 1} and Row {row2 + 1}")
+            msg = QMessageBox()
+            msg.setWindowTitle("Resolve Ambiguity")
+            msg.setText(
+                f"Do you want to automatically fix this ambiguity?\n\n"
+                f"Row {row_item + 1}\n{id_item or '(No ID)'}\n{req_item}"
+            )
+            msg.setIcon(QMessageBox.Question)
 
-        # Ask the user which one to keep
-        msg = QMessageBox()
-        msg.setWindowTitle("Resolve Conflict")
-        msg.setText(
-            f"Which requirement do you want to keep?\n\n"
-            f"Option A: \nRow {row1 + 1}\n{id1 or '(No ID)'}\n{req1}\n\n"
-            f"Option B: \nRow {row2 + 1}\n{id2 or '(No ID)'}\n{req2}"
-        )
-        msg.setIcon(QMessageBox.Question)
+            btn_accept = msg.addButton("Accept", QMessageBox.AcceptRole)
+            msg.addButton(QMessageBox.Cancel)
 
-        btn_a = msg.addButton(f"Keep A", QMessageBox.AcceptRole)
-        btn_b = msg.addButton(f"Keep B", QMessageBox.RejectRole)
-        msg.addButton(QMessageBox.Cancel)
+            msg.exec_()
 
-        msg.exec_()
+            if msg.clickedButton() != btn_accept:
+                return
 
-        if msg.clickedButton() == btn_a:
-            choice = item1
-            to_remove = item2
-        elif msg.clickedButton() == btn_b:
-            choice = item2
-            to_remove = item1
+            result = self.conflict_solver.solve_conflict(warning_type, item1)
+
+            if result is not None:
+                new_text = result
+                self.add_status(f"✅ Ambiguity resolved for {id_item or f'Row {row_item + 1}'}")
+
+                current_section = self.tab_widget.currentWidget()
+                if hasattr(current_section, "update_row_text"):
+                    current_section.update_row_text(row_item, new_text)
+
+                current_section.show_conflicts()
+            else:
+                self.add_status("Could not resolve ambiguity.")
+
+        # Pair-item conflict (e.g., redundancy, similarity, contradiction)
         else:
-            return
+            row1, id1, req1 = item1
+            row2, id2, req2 = item2
 
-        # Resolve conflict
-        result = self.conflict_solver.solve_conflict(warning_type, item1, item2, choice)
+            print(f"Fixing {warning_type.lower()} conflict between Row {row1 + 1} and Row {row2 + 1}")
 
-        if result is not None:
-            kept_row, kept_id, kept_req = result
-            self.add_status(f"✅ Conflict resolved. Kept: {kept_id or f'Row {kept_row + 1}'}")
+            msg = QMessageBox()
+            msg.setWindowTitle("Resolve Conflict")
+            msg.setText(
+                f"Which requirement do you want to keep?\n\n"
+                f"Option A: \nRow {row1 + 1}\n{id1 or '(No ID)'}\n{req1}\n\n"
+                f"Option B: \nRow {row2 + 1}\n{id2 or '(No ID)'}\n{req2}"
+            )
+            msg.setIcon(QMessageBox.Question)
 
-            # ✅ Remove the row that was NOT chosen
-            if self.tab_widget:
+            btn_a = msg.addButton("Keep A", QMessageBox.AcceptRole)
+            btn_b = msg.addButton("Keep B", QMessageBox.RejectRole)
+            msg.addButton(QMessageBox.Cancel)
+
+            msg.exec_()
+
+            if msg.clickedButton() == btn_a:
+                choice = item1
+                to_remove = item2
+            elif msg.clickedButton() == btn_b:
+                choice = item2
+                to_remove = item1
+            else:
+                return
+
+            result = self.conflict_solver.solve_conflict(warning_type, item1, item2, choice)
+
+            if result is not None:
+                kept_row, kept_id, _ = result
+                self.add_status(f"✅ Conflict resolved. Kept: {kept_id or f'Row {kept_row + 1}'}")
+
                 current_section = self.tab_widget.currentWidget()
                 if hasattr(current_section, "remove_conflict_row"):
                     current_section.remove_conflict_row(to_remove[0])
                     current_section.show_conflicts()
-        else:
-            self.add_status("Could not resolve conflict.")
+            else:
+                self.add_status("Could not resolve conflict.")
+
+
 
 

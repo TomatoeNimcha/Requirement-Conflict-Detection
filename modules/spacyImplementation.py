@@ -82,9 +82,9 @@ class SpacyImplementation:
         
     
 
-test = SpacyImplementation()
-print(test.replace_word("I may be gay.", "may", "will"))
-print(test.replace_vague_with_strong("I may be lesbian."))
+# test = SpacyImplementation()
+# print(test.replace_word("I may be gay.", "may", "will"))
+# print(test.replace_vague_with_strong("I may be lesbian."))
 
 
         
