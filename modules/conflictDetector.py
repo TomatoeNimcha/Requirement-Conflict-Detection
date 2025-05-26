@@ -1,5 +1,3 @@
-from PySide6.QtGui import QColor, QBrush
-
 from modules.spacyImplementation import SpacyImplementation
 
 

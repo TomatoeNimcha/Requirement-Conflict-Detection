@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import (
-    QWidget, QFileDialog, QMenuBar, QMessageBox,
-    QLabel, QTableWidget, QTableWidgetItem, QPushButton,
+    QWidget, QFileDialog, QMenuBar, QMessageBox, QMenu,
+    QLabel, QTableWidget, QTableWidgetItem, QPushButton, 
     QDialog, QFormLayout, QLineEdit, QSpinBox, QDialogButtonBox, QInputDialog
 )
+
+from PySide6.QtCore import QEvent
 
 from ui.tabsection import TabSection
 from ui.requirementsection import RequirementSection
@@ -24,6 +26,7 @@ class MenuSection(QWidget):
         file_menu = self.menu_bar.addMenu("&File")
         import_action = file_menu.addAction("Import")
         export_action = file_menu.addAction("Export")
+        export_text_action = file_menu.addAction("Export txt")
         template_action = file_menu.addAction("Template")
 
         modify_menu = self.menu_bar.addMenu("&Modify")
@@ -36,6 +39,7 @@ class MenuSection(QWidget):
         # Connect actions to methods
         import_action.triggered.connect(self.import_requirements)
         export_action.triggered.connect(self.export_requirements)
+        export_text_action.triggered.connect(self.export_requirements_as_txt)
         template_action.triggered.connect(self.requirement_template)
 
         compare_action.triggered.connect(self.compare_requirements)
@@ -43,8 +47,22 @@ class MenuSection(QWidget):
         identification_action.triggered.connect(self.automatic_identification)
 
         search_action.triggered.connect(self.search)
-        
 
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.ContextMenu:
+            widget = self.window.widgetAt(event.globalPos())
+
+            # Check if the right-click is on a QTableWidget
+            if isinstance(widget, QTableWidget):
+                self.show_table_context_menu(event.globalPos(), widget)
+                return True  # Stop further propagation
+
+        return super().eventFilter(source, event)
+    
+    def show_table_context_menu(self, global_pos, table_widget):
+        menu = QMenu()
+
+        selected_action = menu.exec(global_pos)
 
     def import_requirements(self):
         filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
@@ -78,6 +96,35 @@ class MenuSection(QWidget):
                 data = FileOperations.table_to_dictionary(widget.get_title(), widget.get_author(), widget.get_table_contents())
                 FileOperations.write_file(filepath, data)
                 QMessageBox.information(self, "Export Successful", f"Exported to {filepath}")
+            else:
+                QMessageBox.warning(self, "Export Error", "Not a requirement tab!")
+            
+    def export_requirements_as_txt(self):
+        filepath, _ = QFileDialog.getSaveFileName(self, "Save Requirements as TXT", "", "Text Files (*.txt)")
+
+        if filepath:
+            widget = self.tab_widget.currentWidget()
+            if isinstance(widget, RequirementSection):
+                title = widget.get_title()
+                author = widget.get_author()
+                table_data = widget.get_table_contents()
+
+                lines = []
+                lines.append(f"Title: {title}")
+                lines.append(f"Author: {author}")
+                lines.append("\nRequirements:")
+                lines.append("Row | ID | Description | Attributes")
+                lines.append("-" * 60)
+
+                for row, req_id, req_text, req_att in table_data:
+                    lines.append(f"{row} | {req_id} | {req_text} | {req_att}")
+
+                try:
+                    with open(filepath, "w", encoding="utf-8") as f:
+                        f.write("\n".join(lines))
+                    QMessageBox.information(self, "Export Successful", f"Exported to {filepath}")
+                except Exception as e:
+                    QMessageBox.critical(self, "Export Failed", f"An error occurred:\n{str(e)}")
             else:
                 QMessageBox.warning(self, "Export Error", "Not a requirement tab!")
 
@@ -266,9 +313,5 @@ class MenuSection(QWidget):
 
 
 
-
-# class RightClickMenuSection(QWidget):
-#     def __init__(self, window, tab_widget, warning_widget, conflict_detector):
-#         super().__init__()
 
 

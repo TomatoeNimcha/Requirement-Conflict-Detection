@@ -2,11 +2,14 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QWidget, QGridLayout, QLabel,
     QTableWidget,QTableWidgetItem, QPushButton, QVBoxLayout, QHBoxLayout)
 
+from PySide6.QtCore import QTimer
+
 from ui.requirementsection import RequirementSection
 from ui.warningsection import WarningSection
 from ui.tabsection import TabSection
 from ui.menusection import MenuSection
 from modules.conflictDetector import ConflictDetector
+from modules.backupOperations import BackupOperations
 
 class MainWindow(QMainWindow):
     def __init__(self,app):
@@ -38,6 +41,12 @@ class MainWindow(QMainWindow):
         # center_widget = RequirementSection()
         # layout.addWidget(center_widget, 1, 0)   
 
+        # ____RETRIEVE BACKUP____
+        self.backup = BackupOperations(tab_widget)
+        if self.backup.is_backup_empty() == True:
+            tab_widget.add_requirement_tab(title="Requirement List")
+        else:
+            self.backup.retrieve_backup()
 
         # Set column stretches: left wider than right
         layout.setColumnStretch(0, 3)  # main content area
@@ -46,4 +55,10 @@ class MainWindow(QMainWindow):
         # Set Layout
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
+
+        #____AUTO BACKUP____
+        QTimer.singleShot(1000, self.backup.perform_backup)
+        self.backup_timer = QTimer(self)
+        self.backup_timer.timeout.connect(self.backup.perform_backup)
+        self.backup_timer.start(1000*60*5) # 1000 ms * 60 sec * 5 min = 300,000 ms or 5 minute 
 

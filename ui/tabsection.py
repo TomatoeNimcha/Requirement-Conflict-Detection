@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
 )
 
 from ui.requirementsection import RequirementSection
+from modules.backupOperations import BackupOperations
 
 class TabSection(QTabWidget):
     def __init__(self, warning_widget, conflict_detector):
@@ -16,8 +17,9 @@ class TabSection(QTabWidget):
         self.setStyleSheet("QTabBar::tab { height: 30px; padding: 8px; }")
         self.setTabsClosable(True)
 
-        # Add initial tabs
-        self.add_requirement_tab(title="Requirement List")
+        # # Add initial tabs
+        # if self.backup_check == True:
+        #     self.add_requirement_tab(title="Requirement List")
 
         # Add "+" tab
         self.plus_tab = QWidget()
@@ -40,13 +42,14 @@ class TabSection(QTabWidget):
                 self.add_requirement_tab(title=name)
 
 
-    # ISSUE : THIS WONT WORK UNLESS THERES AN INITIAL TAB BEFORE
     def add_requirement_tab(self, title=None, author=None):
         index = self.count() - 1  # always insert before "+" tab
         tab_name = title if title else f"List {index + 1}"
         tab = RequirementSection(self.warning_widget,self.conflict_detector,title=tab_name)
         self.insertTab(index, tab, tab_name)
         self.setCurrentIndex(index)  
+ 
+        return tab
 
     def close_tab(self, index):
         # Prevent closing the "+" tab

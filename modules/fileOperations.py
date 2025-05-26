@@ -37,9 +37,19 @@ class FileOperations:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
     def load_file(filename):
-        base_dir = os.path.dirname(os.path.abspath(__file__))  # Current file directory
-        template_path = os.path.join(base_dir, "data", "template", filename)
+        base_dir = os.path.dirname(os.path.abspath(__file__)) 
+        path = os.path.join(base_dir, "data", filename)
 
-        with open(template_path, "r", encoding="utf-8") as file:
+        with open(path, "r", encoding="utf-8") as file:
             data = json.load(file)
             return data
+        
+    def save_file(filename, data):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(base_dir, "data")
+        os.makedirs(data_dir, exist_ok=True)
+
+        path = os.path.join(data_dir, filename)
+
+        with open(path, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)

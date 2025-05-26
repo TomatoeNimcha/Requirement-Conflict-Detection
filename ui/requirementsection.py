@@ -87,9 +87,15 @@ class RequirementSection(QWidget):
         self.table.removeRow(row)
 
     def update_row_text(self, row_index, new_text):
-        table = self.table  # or self.tableWidget or however you refer to it
+        table = self.table  
         if 0 <= row_index < table.rowCount():
             table.setItem(row_index, 1, QTableWidgetItem(new_text)) 
+
+    def update_any_text(self, row, collumn, text):
+        table = self.table 
+        if 0 <= row < table.rowCount():
+            table.setItem(row, collumn, QTableWidgetItem(text)) 
+
 
     def get_table_contents(self):
         table_contents = []
