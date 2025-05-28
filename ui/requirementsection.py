@@ -119,6 +119,9 @@ class RequirementSection(QWidget):
     
     def get_author(self):
         return self.author.text()
+    
+    def get_total_row(self):
+        return self.table.rowCount()
 
     def get_conflict_from_table(self):
         print("This is get conflcit from table")
@@ -166,7 +169,7 @@ class RequirementSection(QWidget):
                     if item2:
                         item2.setBackground(QColor(color))
             elif isinstance(entry, int):
-                # Single row (e.g., ambiguity)
+                # Single row 
                 for col in range(self.table.columnCount()):
                     item = self.table.item(entry, col)
                     if item:
@@ -181,6 +184,7 @@ class RequirementSection(QWidget):
         self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"], 2), "orangeRed")
         self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"], 2), "goldenRod")
         self.highlight_rows(self.conflict_detector.extract_rows(conflicts["ambiguity"], 1), "indigo")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["incomplete"], 1), "fireBrick")
 
 
         self.warning_widget.conflict_warning(conflicts)

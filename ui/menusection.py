@@ -4,20 +4,25 @@ from PySide6.QtWidgets import (
     QDialog, QFormLayout, QLineEdit, QSpinBox, QDialogButtonBox, QInputDialog
 )
 
-from PySide6.QtCore import QEvent
+from PySide6.QtGui import QPalette, QColor
+from PySide6.QtCore import QEvent, Qt
 
 from ui.tabsection import TabSection
 from ui.requirementsection import RequirementSection
 from modules.fileOperations import FileOperations
+from modules.backupOperations import BackupOperations
 from data.template import template
 
+import qdarktheme
+
 class MenuSection(QWidget):
-    def __init__(self, window, tab_widget, warning_widget, conflict_detector):
+    def __init__(self, window, tab_widget, warning_widget, conflict_detector, backup):
         super().__init__()
         self.window = window
         self.tab_widget = tab_widget
         self.warning_widget = warning_widget
         self.conflict_detector = conflict_detector
+        self.backup = backup
         self.menu_bar = self.window.menuBar()
 
         self.create_menus()
@@ -26,8 +31,16 @@ class MenuSection(QWidget):
         file_menu = self.menu_bar.addMenu("&File")
         import_action = file_menu.addAction("Import")
         export_action = file_menu.addAction("Export")
-        export_text_action = file_menu.addAction("Export txt")
+        export_text_action = file_menu.addAction("Export as text")
         template_action = file_menu.addAction("Template")
+        save_action = file_menu.addAction("Save")
+
+        preference_menu = self.menu_bar.addMenu("&Preference")
+        mode_action = preference_menu.addMenu("Modes")
+        light_mode_action = mode_action.addAction("Light Mode")
+        dark_mode_action = mode_action.addAction("Dark Mode")
+        auto_mode_action = mode_action.addAction("Auto Mode")
+        font_action = preference_menu.addAction("Change Font")
 
         modify_menu = self.menu_bar.addMenu("&Modify")
         compare_action = modify_menu.addAction("Compare Lists")
@@ -36,11 +49,18 @@ class MenuSection(QWidget):
 
         search_action = self.menu_bar.addAction("&Search")
 
+
         # Connect actions to methods
         import_action.triggered.connect(self.import_requirements)
         export_action.triggered.connect(self.export_requirements)
         export_text_action.triggered.connect(self.export_requirements_as_txt)
         template_action.triggered.connect(self.requirement_template)
+        save_action.triggered.connect(self.save_progress)
+
+        light_mode_action.triggered.connect(self.light_mode)
+        dark_mode_action.triggered.connect(self.dark_mode)
+        auto_mode_action.triggered.connect(self.auto_mode)
+        font_action.triggered.connect(self.change_font)
 
         compare_action.triggered.connect(self.compare_requirements)
         merge_action.triggered.connect(self.merge_requirements)
@@ -48,6 +68,8 @@ class MenuSection(QWidget):
 
         search_action.triggered.connect(self.search)
 
+
+    # Right click Menu
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu:
             widget = self.window.widgetAt(event.globalPos())
@@ -55,7 +77,7 @@ class MenuSection(QWidget):
             # Check if the right-click is on a QTableWidget
             if isinstance(widget, QTableWidget):
                 self.show_table_context_menu(event.globalPos(), widget)
-                return True  # Stop further propagation
+                return True 
 
         return super().eventFilter(source, event)
     
@@ -63,6 +85,18 @@ class MenuSection(QWidget):
         menu = QMenu()
 
         selected_action = menu.exec(global_pos)
+
+    def dark_mode(self):
+        qdarktheme.setup_theme("dark")
+
+    def light_mode(self):
+        qdarktheme.setup_theme("light")
+
+    def auto_mode(self):
+        qdarktheme.setup_theme("auto")
+        
+    def change_font():
+        pass
 
     def import_requirements(self):
         filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
@@ -290,6 +324,10 @@ class MenuSection(QWidget):
             new_id = f"{prefix.text()}{str(start_num).zfill(num_digits)}{suffix.text()}"
             table.setItem(row, 0, QTableWidgetItem(new_id))
             start_num += 1
+
+    def save_progress(self):
+        self.backup.perform_backup()
+
 
     def search(self):
         # Ask the user for search text

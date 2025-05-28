@@ -11,6 +11,7 @@ class ConflictDetector:
         conflicts_similarity = []
         conflicts_contradiction = []
         conflicts_ambiguity = []
+        conflicts_incomplete = []
 
         # STEP 1: Preprocess and cache Spacy Docs
         docs = []
@@ -24,6 +25,9 @@ class ConflictDetector:
             row, id_, req, _ = table_contents[i]
             if self.spacy.ambiguity_check(req):
                 conflicts_ambiguity.append((row, id_, req))
+
+            if self.spacy.incomplete_check(req):
+                conflicts_incomplete.append((row, id_, req))
 
         # STEP 2: Compare only valid pairs
         for i in range(len(table_contents)):
@@ -53,7 +57,8 @@ class ConflictDetector:
             "redundancy": conflicts_redundancy,
             "similarity": conflicts_similarity,
             "contradiction": conflicts_contradiction,
-            "ambiguity" : conflicts_ambiguity
+            "ambiguity" : conflicts_ambiguity,
+            "incomplete" : conflicts_incomplete 
         }
     
     def total_confict(self, detect_conflict_result={}):
@@ -61,6 +66,7 @@ class ConflictDetector:
         total += len(detect_conflict_result.get("similarity", [])) 
         total += len(detect_conflict_result.get("contradiction", [])) 
         total += len(detect_conflict_result.get("ambiguity", [])) 
+        total += len(detect_conflict_result.get("incomplete", [])) 
         return total
         
     def extract_rows(self, conflict_list, num):

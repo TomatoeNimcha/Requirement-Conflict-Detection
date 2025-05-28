@@ -15,7 +15,7 @@ class BackupOperations:
     def perform_backup(self):
         print("Backup performed")
         all_data = []
-        for i in range(self.tab_widget.count()):
+        for i in range(self.tab_widget.count()-1):
             widget = self.tab_widget.widget(i)
 
             title = widget.get_title()
@@ -40,7 +40,7 @@ class BackupOperations:
         for data in all_data:
             title, author, requirements = FileOperations.dictionary_to_table(data)
 
-            new_tab = self.tab_widget.add_requirement_tab(title, author)
+            new_tab = self.tab_widget.add_requirement_tab(title=title, author=author)
             
             while new_tab.table.rowCount() > 0:
                 new_tab.table.removeRow(0)

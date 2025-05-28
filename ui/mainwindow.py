@@ -11,6 +11,8 @@ from ui.menusection import MenuSection
 from modules.conflictDetector import ConflictDetector
 from modules.backupOperations import BackupOperations
 
+import qdarktheme
+
 class MainWindow(QMainWindow):
     def __init__(self,app):
         super().__init__()
@@ -33,10 +35,6 @@ class MainWindow(QMainWindow):
         warning_widget.set_tab_widget(tab_widget)
         layout.addWidget(tab_widget, 1, 0, 1, 1)
 
-        # ____MENU SECTION____
-        self.menu = MenuSection(self,tab_widget,warning_widget,self.conflict_detector)
-
-
         # --- CENTER REQUIREMENT TABLE AREA ---
         # center_widget = RequirementSection()
         # layout.addWidget(center_widget, 1, 0)   
@@ -47,6 +45,9 @@ class MainWindow(QMainWindow):
             tab_widget.add_requirement_tab(title="Requirement List")
         else:
             self.backup.retrieve_backup()
+
+        # ____MENU SECTION____
+        self.menu = MenuSection(self,tab_widget,warning_widget,self.conflict_detector, self.backup)
 
         # Set column stretches: left wider than right
         layout.setColumnStretch(0, 3)  # main content area

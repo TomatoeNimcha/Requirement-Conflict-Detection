@@ -18,6 +18,8 @@ class ConflictSolver:
             return self.solve_contradiction(item1, item2, choice)
         elif conflict_type == "ambiguity":
             return self.solve_ambiguity(item1[2])
+        elif conflict_type == "incomplete":
+            return self.solve_incomplete()
         else:
             return None
 
@@ -40,6 +42,11 @@ class ConflictSolver:
     
     def solve_ambiguity(self, sentence):
         return self.spacy.replace_vague_with_strong(sentence)
+    
+    def solve_incomplete(self):
+        # This will be solved by deletion in the requirement list in ui instead of here.
+        # This serves as a placeholder for expanding development
+        return True
     
     def seperate_items(self,conflict_pair=(),item_num=None):
         item1, item2 = conflict_pair

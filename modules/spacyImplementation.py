@@ -11,8 +11,8 @@ class SpacyImplementation:
 
         # Keywords for word checking
         self.negative_keywords = ["must not", "should not", "cannot", "never", "no", "not allowed", "not"]
-        self.vague_keywords = ["maybe", "may", "might", "could"]
-        self.strong_keywords = ["shall", "must", "will", "should"]
+        self.vague_keywords = ["maybe", "might", "could"]
+        self.strong_keywords = ["shall", "will", "should", "may"] #another word check standard guideline
 
         # Below are unimplemented keywords that can be used in future developments
         # self.vague_keywords = [""
@@ -56,6 +56,13 @@ class SpacyImplementation:
         else:
             return False
         
+    def incomplete_check(self, sentence=""):
+        if self.is_incomplete(sentence) == True:
+            return True
+        else:
+            return False
+        
+        
     def replace_word(self, sentence="", word="", with_word=""):
         doc = self.nlp(sentence)
         new_tokens = []
@@ -79,6 +86,35 @@ class SpacyImplementation:
                 new_sentence = self.replace_word(sentence, word.text, with_word)
 
         return new_sentence
+
+    def is_incomplete(self, sentence):
+        doc = self.get_nlp(sentence)
+        
+        # If sentence too short its probably incomplete
+        if len(doc) < 3:
+            return True
+
+        # Check if there's a subject (nsubj = nominal subject)
+        has_subject = any(tok.dep_ in ("nsubj", "nsubjpass") for tok in doc)
+
+        # Check if there's a main verb (ROOT verb or auxiliary verb)
+        has_verb = any(tok.dep_ == "ROOT" and tok.pos_ in ("VERB", "AUX") for tok in doc)
+
+        # If it's missing either subject or verb, it's probably incomplete
+        if not has_subject or not has_verb:
+            return True
+
+        # If the sentence ends with conjunction like and, or, its definitely incomplete
+        if doc[-1].text.lower() in {"and", "or", "but"}:
+            return True
+
+        # If it starts with a marker like "when", "if" and is short, probably incomplete
+        if doc[0].dep_ == "mark" and len(doc) < 7:
+            return True
+
+        # Otherwise, it seems complete
+        return False
+
         
     
 

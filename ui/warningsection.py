@@ -123,9 +123,10 @@ class WarningSection(QWidget):
 
         conflict_types = ["similarity", "redundancy", "contradiction"]
         total = sum(len(conflicts.get(key, [])) for key in conflict_types)
+        total_row = self.tab_widget.currentWidget().get_total_row()  
 
-        if total > 0 or conflicts.get("ambiguity"):
-            self.add_status(f"{total} conflict(s) found!" if total else "")
+        if total > 0 or conflicts.get("ambiguity") or conflicts.get("incomplete"):
+            self.add_status(f"{total} conflict(s) found between {total_row} rows!" if total else "")
 
             for conflict_type in conflict_types:
                 for conflict_pair in conflicts.get(conflict_type, []):
@@ -154,23 +155,37 @@ class WarningSection(QWidget):
                 label = id_item if id_item else f"Row {row_item + 1}"
                 self.add_warning("🟤 Ambiguity", f"{label}", f"{label} is using ambiguous word(s)!",
                                 "ambiguity", conflict_item)
+            for conflict_item in conflicts.get("incomplete", []):
+                row_item, id_item, req_item = conflict_item
+                label = id_item if id_item else f"Row {row_item + 1}"
+                self.add_warning("🟥 Incomplete", f"{label}", f"{label} has incomplete written requirement!",
+                                "incomplete", conflict_item)
         else:
             self.add_status("🟢 No conflict detected.")
 
     def solve_warning(self, warning_type=None, item1=None, item2=None):
-        # Single-item conflict (e.g., ambiguity)
+        # Single-item conflict
         if item2 is None:
             row_item, id_item, req_item = item1
             print(f"Fixing {warning_type.lower()} conflict of Row {row_item + 1}")
 
             msg = QMessageBox()
-            msg.setWindowTitle("Resolve Ambiguity")
-            msg.setText(
-                f"Do you want to automatically fix this ambiguity?\n\n"
-                f"Row {row_item + 1}\n{id_item or '(No ID)'}\n{req_item}"
-            )
-            msg.setIcon(QMessageBox.Question)
+            
+            if warning_type == "ambiguity":
+                msg.setWindowTitle("Resolve Ambiguity")
+                msg.setText(
+                    f"Do you want to automatically fix this ambiguity?\n\n"
+                    f"Row {row_item + 1}\n{id_item or '(No ID)'}\n{req_item}"
+                )
+            elif warning_type == "incomplete":
+                msg.setWindowTitle("Remove Incomplete Requirement")
+                msg.setText(
+                    f"This sentence seems incomplete.\n\n"
+                    f"Row {row_item + 1}\n{id_item or '(No ID)'}\n{req_item}\n\n"
+                    f"Do you want to delete it?"
+                )
 
+            msg.setIcon(QMessageBox.Question)
             btn_accept = msg.addButton("Accept", QMessageBox.AcceptRole)
             msg.addButton(QMessageBox.Cancel)
 
@@ -181,17 +196,22 @@ class WarningSection(QWidget):
 
             result = self.conflict_solver.solve_conflict(warning_type, item1)
 
-            if result is not None:
-                new_text = result
-                self.add_status(f"✅ Ambiguity resolved for {id_item or f'Row {row_item + 1}'}")
+            current_section = self.tab_widget.currentWidget()
 
-                current_section = self.tab_widget.currentWidget()
-                if hasattr(current_section, "update_row_text"):
-                    current_section.update_row_text(row_item, new_text)
+            if result is not None:
+                if warning_type == "ambiguity":
+                    new_text = result
+                    self.add_status(f"✅ Ambiguity resolved for {id_item or f'Row {row_item + 1}'}")
+                    if hasattr(current_section, "update_row_text"):
+                        current_section.update_row_text(row_item, new_text)
+                elif warning_type == "incomplete":
+                    self.add_status(f"🗑️ Incomplete requirement deleted: {id_item or f'Row {row_item + 1}'}")
+                    if hasattr(current_section, "remove_conflict_row"):
+                        current_section.remove_conflict_row(row_item)
 
                 current_section.show_conflicts()
             else:
-                self.add_status("Could not resolve ambiguity.")
+                self.add_status("Could not resolve conflict.")
 
         # Pair-item conflict (e.g., redundancy, similarity, contradiction)
         else:
