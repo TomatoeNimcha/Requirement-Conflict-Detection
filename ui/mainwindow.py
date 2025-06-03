@@ -10,6 +10,7 @@ from ui.tabsection import TabSection
 from ui.menusection import MenuSection
 from modules.conflictDetector import ConflictDetector
 from modules.backupOperations import BackupOperations
+from modules.mediaPlayer import MediaPlayer
 
 import qdarktheme
 
@@ -20,6 +21,7 @@ class MainWindow(QMainWindow):
         self.app = app
         self.setWindowTitle("Requirements Conflict Detection Software")
         self.conflict_detector = ConflictDetector()
+        self.media_player = MediaPlayer()
 
         # ____LAYOUT____
         #For some reason QMainWindow need central widget to make layout work 
@@ -27,7 +29,7 @@ class MainWindow(QMainWindow):
         layout = QGridLayout()
 
         # ____WARNING SECTION____
-        warning_widget = WarningSection(None)
+        warning_widget = WarningSection(None, self.media_player)
         layout.addWidget(warning_widget, 1, 1)
         
         # ____TAB SECTION____
@@ -47,7 +49,9 @@ class MainWindow(QMainWindow):
             self.backup.retrieve_backup()
 
         # ____MENU SECTION____
-        self.menu = MenuSection(self,tab_widget,warning_widget,self.conflict_detector, self.backup)
+        self.menu = MenuSection(
+            self, self.media_player, tab_widget,warning_widget,
+            self.conflict_detector, self.backup)
 
         # Set column stretches: left wider than right
         layout.setColumnStretch(0, 3)  # main content area
@@ -55,7 +59,7 @@ class MainWindow(QMainWindow):
 
         # Set Layout
         central_widget.setLayout(layout)
-        self.setCentralWidget(central_widget)
+        self.setCentralWidget(central_widget) 
 
         #____AUTO BACKUP____
         QTimer.singleShot(1000, self.backup.perform_backup)

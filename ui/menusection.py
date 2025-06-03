@@ -1,10 +1,11 @@
 from PySide6.QtWidgets import (
     QWidget, QFileDialog, QMenuBar, QMessageBox, QMenu,
     QLabel, QTableWidget, QTableWidgetItem, QPushButton, 
-    QDialog, QFormLayout, QLineEdit, QSpinBox, QDialogButtonBox, QInputDialog
+    QDialog, QFormLayout, QLineEdit, QSpinBox, QDialogButtonBox, QInputDialog,
+    QFontDialog, QApplication
 )
 
-from PySide6.QtGui import QPalette, QColor
+from PySide6.QtGui import QPalette, QColor, QFont
 from PySide6.QtCore import QEvent, Qt
 
 from ui.tabsection import TabSection
@@ -16,14 +17,17 @@ from data.template import template
 import qdarktheme
 
 class MenuSection(QWidget):
-    def __init__(self, window, tab_widget, warning_widget, conflict_detector, backup):
+    def __init__(self, window, media_player, tab_widget, warning_widget, conflict_detector, backup):
         super().__init__()
         self.window = window
+        self.media_player = media_player
         self.tab_widget = tab_widget
         self.warning_widget = warning_widget
         self.conflict_detector = conflict_detector
         self.backup = backup
         self.menu_bar = self.window.menuBar()
+
+        self.sound_action = None
 
         self.create_menus()
 
@@ -41,6 +45,9 @@ class MenuSection(QWidget):
         dark_mode_action = mode_action.addAction("Dark Mode")
         auto_mode_action = mode_action.addAction("Auto Mode")
         font_action = preference_menu.addAction("Change Font")
+        self.sound_action = preference_menu.addAction("Toggle Sound")
+        self.sound_action.setCheckable(True)
+        self.sound_action.setChecked(True)
 
         modify_menu = self.menu_bar.addMenu("&Modify")
         compare_action = modify_menu.addAction("Compare Lists")
@@ -61,6 +68,7 @@ class MenuSection(QWidget):
         dark_mode_action.triggered.connect(self.dark_mode)
         auto_mode_action.triggered.connect(self.auto_mode)
         font_action.triggered.connect(self.change_font)
+        self.sound_action.triggered.connect(self.toggle_sound)
 
         compare_action.triggered.connect(self.compare_requirements)
         merge_action.triggered.connect(self.merge_requirements)
@@ -95,8 +103,24 @@ class MenuSection(QWidget):
     def auto_mode(self):
         qdarktheme.setup_theme("auto")
         
-    def change_font():
-        pass
+    def change_font(self):
+        ok, font = QFontDialog.getFont(self.window)
+        if ok:
+            self.window.app.setFont(font) 
+
+            # Recursively apply to existing widgets
+            def apply_font_recursively(widget):
+                print(f"Applying font to: {widget}")
+                widget.setFont(font)
+                for child in widget.findChildren(QWidget):
+                    apply_font_recursively(child)
+
+            apply_font_recursively(self.window)
+
+    def toggle_sound(self):
+        is_checked = self.sound_action.isChecked()
+        print(is_checked)
+        self.media_player.toggle_sound(is_checked)
 
     def import_requirements(self):
         filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")

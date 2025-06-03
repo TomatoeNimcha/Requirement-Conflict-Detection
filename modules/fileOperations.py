@@ -53,3 +53,8 @@ class FileOperations:
 
         with open(path, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
+
+    def get_file_path(foldername, filename):
+        base_dir = os.path.dirname(os.path.abspath(__file__))  
+        project_root = os.path.abspath(os.path.join(base_dir, ".."))  
+        return os.path.join(project_root, foldername, filename)

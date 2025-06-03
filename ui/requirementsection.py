@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QApplication,
-    QLabel, QTableWidget, QTableWidgetItem, QPushButton,QLineEdit
+    QLabel, QTableWidget, QTableWidgetItem, QPushButton,QLineEdit,
+    QHeaderView
 )
 from PySide6.QtCore import Qt, Signal, QObject, QTimer
 from PySide6.QtGui import QColor, QBrush
@@ -39,14 +40,13 @@ class RequirementSection(QWidget):
         self.table = QTableWidget(10, 3)
         self.table.setHorizontalHeaderLabels(["Requirement ID", "Requirement", "Notes"])
         self.table.setColumnWidth(0, 100) #ID
-        self.table.setColumnWidth(1, 325) #Requirement
+        self.table.setColumnWidth(1, 500) #Requirement
         #self.table.setColumnWidth(2, 100) #Attributes, useless because it stretches to the right anyways
-        self.table.horizontalHeader().setStretchLastSection(True)
-        
+        self.table.horizontalHeader().setStretchLastSection(True)    
         
         # Example Table Contents
         self.table.setItem(0, 0, QTableWidgetItem("REQ-001"))
-        self.table.setItem(0, 1, QTableWidgetItem("User can log in"))
+        self.table.setItem(0, 1, QTableWidgetItem("The user can log in"))
         self.table.setItem(0, 2, QTableWidgetItem("Functional Requirement"))
         layout.addWidget(self.table)
 
@@ -175,6 +175,9 @@ class RequirementSection(QWidget):
                     if item:
                         item.setBackground(QColor(color))
 
+
+                
+    #Theres two of these because it kept breaking when i try to combine them
     def show_conflicts(self):
         self.clear_highlights()
 
@@ -193,10 +196,11 @@ class RequirementSection(QWidget):
     def show_combined_conflicts(self, conflicts):
         self.clear_highlights()
 
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["redundancy"], 2), "red")
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"], 2), "orange")
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"], 2), "yellow")
-        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["ambiguity"], 1), "purple")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["redundancy"], 2), "fireBrick")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["contradiction"], 2), "orangeRed")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["similarity"], 2), "goldenRod")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["ambiguity"], 1), "indigo")
+        self.highlight_rows(self.conflict_detector.extract_rows(conflicts["incomplete"], 1), "fireBrick")
 
         self.warning_widget.conflict_warning(conflicts)
 

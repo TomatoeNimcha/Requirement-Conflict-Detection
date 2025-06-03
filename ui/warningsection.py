@@ -1,14 +1,16 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QScrollArea, QFrame, QSizePolicy, QMessageBox
-from PySide6.QtCore import Qt, Signal, QObject
+from PySide6.QtCore import Qt, Signal, QObject, QUrl
 
 from modules.conflictSolver import ConflictSolver
+from modules.fileOperations import FileOperations
 
 class WarningSection(QWidget):
-    def __init__(self, tab_widget):
+    def __init__(self, tab_widget, media_player):
         super().__init__()
 
         self.conflict_solver = ConflictSolver()
         self.tab_widget = tab_widget
+        self.media_player = media_player
 
         main_layout = QVBoxLayout()
         self.setLayout(main_layout)
@@ -30,6 +32,11 @@ class WarningSection(QWidget):
         scroll_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
 
         main_layout.addWidget(scroll)
+
+        dismiss_button = QPushButton("Dismiss Warnings")
+        dismiss_button.clicked.connect(self.clear_warnings_and_highlights)
+        main_layout.addWidget(dismiss_button)
+
 
     def set_tab_widget(self,tab_widget):
         self.tab_widget = tab_widget
@@ -97,6 +104,10 @@ class WarningSection(QWidget):
         self.warning_layout.addWidget(bubble)
         quick_fix_btn.clicked.connect(lambda: self.solve_warning(conflict_type, item1, item2))
 
+    def clear_warnings_and_highlights(self):
+        self.clear_warnings()
+        self.tab_widget.currentWidget().clear_highlights()
+
     def add_status(self, text):
         bubble = QWidget()
         layout = QVBoxLayout()
@@ -122,7 +133,7 @@ class WarningSection(QWidget):
         print(conflicts)
 
         conflict_types = ["similarity", "redundancy", "contradiction"]
-        total = sum(len(conflicts.get(key, [])) for key in conflict_types)
+        total = sum(len(conflicts.get(key, [])) for key in ["similarity", "redundancy", "contradiction", "ambiguity", "incomplete"])
         total_row = self.tab_widget.currentWidget().get_total_row()  
 
         if total > 0 or conflicts.get("ambiguity") or conflicts.get("incomplete"):
@@ -160,6 +171,8 @@ class WarningSection(QWidget):
                 label = id_item if id_item else f"Row {row_item + 1}"
                 self.add_warning("🟥 Incomplete", f"{label}", f"{label} has incomplete written requirement!",
                                 "incomplete", conflict_item)
+            
+            self.media_player.play_warning_sound()
         else:
             self.add_status("🟢 No conflict detected.")
 
