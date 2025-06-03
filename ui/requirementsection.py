@@ -8,16 +8,18 @@ from PySide6.QtGui import QColor, QBrush
 
 from ui.warningsection import WarningSection
 
+# Class for requirement list, author and title
 class RequirementSection(QWidget):
     def __init__(self, warning_widget, conflict_detector, title="Default Title",author="Default Author"):
         super().__init__()
 
-        # Declare variables so it is editable later on
+        # Variables
         self.warning_widget = warning_widget     
         self.title = title
         self.author = author
         self.conflict_detector = conflict_detector
         
+        # Layout
         layout = QVBoxLayout()
 
         # Title
@@ -44,7 +46,7 @@ class RequirementSection(QWidget):
         #self.table.setColumnWidth(2, 100) #Attributes, useless because it stretches to the right anyways
         self.table.horizontalHeader().setStretchLastSection(True)    
         
-        # Example Table Contents
+        # Default Table Contents
         self.table.setItem(0, 0, QTableWidgetItem("REQ-001"))
         self.table.setItem(0, 1, QTableWidgetItem("The user can log in"))
         self.table.setItem(0, 2, QTableWidgetItem("Functional Requirement"))
@@ -69,6 +71,7 @@ class RequirementSection(QWidget):
 
         self.setLayout(layout)
 
+    # Method for adding selected row
     def add_row(self):
         selected = self.table.currentRow()
         if selected >= 0:
@@ -76,27 +79,31 @@ class RequirementSection(QWidget):
         else:
             self.table.insertRow(self.table.rowCount())
 
+    # Method for removing selected row
     def remove_row(self):
         selected = self.table.currentRow()
         if selected >= 0:
             self.table.removeRow(selected)
         else:
             self.table.removeRow(self.table.rowCount())
-    
+
+    # Method for removing conflict row by passing a row into it  
     def remove_conflict_row(self, row):
         self.table.removeRow(row)
 
+    # Method for updating requirement text of a row
     def update_row_text(self, row_index, new_text):
         table = self.table  
         if 0 <= row_index < table.rowCount():
             table.setItem(row_index, 1, QTableWidgetItem(new_text)) 
 
+    # Method for updating requirement of any row and collumn
     def update_any_text(self, row, collumn, text):
         table = self.table 
         if 0 <= row < table.rowCount():
             table.setItem(row, collumn, QTableWidgetItem(text)) 
 
-
+    # Getter for requirement table content
     def get_table_contents(self):
         table_contents = []
 
@@ -114,28 +121,29 @@ class RequirementSection(QWidget):
 
         return table_contents
     
+    # Getter for requirement list title
     def get_title(self):
         return self.title.text()
     
+    # Getter for requirement listauthor name
     def get_author(self):
         return self.author.text()
     
+    # Getter for total requirement list row
     def get_total_row(self):
         return self.table.rowCount()
 
+    # Getter for conflicts found in the requirement list
     def get_conflict_from_table(self):
-        print("This is get conflcit from table")
-        # This doesn't even show up and process events only made it slightly better
-        # BUT I AM NOT DOING THREADS, I REFUSE TO
+        # Does not show due to execution speed but will still be left here
         self.warning_widget.add_status("Detecting conflicts . . . ")
         
-        # QApplication.processEvents()
-
         table_contents = self.get_table_contents()
         conflicts = self.conflict_detector.detect_conflict(table_contents)
 
         return conflicts
-    
+
+   # Method to search something in the requirement list
     def search_table(self, text_to_find):
         table = self.table 
         matches = []
@@ -148,7 +156,7 @@ class RequirementSection(QWidget):
 
         return matches
 
-    
+    # Method to clear highlights in the table
     def clear_highlights(self):
         for row in range(self.table.rowCount()):
             for col in range(self.table.columnCount()):
@@ -156,6 +164,7 @@ class RequirementSection(QWidget):
                 if item:
                     item.setBackground(QColor(Qt.transparent))
 
+    # Method to highlight row with chosen color
     def highlight_rows(self, rows, color):
         for entry in rows:
             if isinstance(entry, tuple) and len(entry) == 2:
@@ -174,10 +183,8 @@ class RequirementSection(QWidget):
                     item = self.table.item(entry, col)
                     if item:
                         item.setBackground(QColor(color))
-
-
                 
-    #Theres two of these because it kept breaking when i try to combine them
+    # Method to show conflicts in the list, theres two of these due to it kept breaking when i try to merge them
     def show_conflicts(self):
         self.clear_highlights()
 
@@ -191,7 +198,6 @@ class RequirementSection(QWidget):
 
 
         self.warning_widget.conflict_warning(conflicts)
-
 
     def show_combined_conflicts(self, conflicts):
         self.clear_highlights()

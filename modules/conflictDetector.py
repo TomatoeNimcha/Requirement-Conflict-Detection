@@ -1,11 +1,15 @@
 from modules.spacyImplementation import SpacyImplementation
 
-
+# Class containing all conflict detection methods
 class ConflictDetector:
     def __init__(self):
+        # Variable
         self.spacy = SpacyImplementation()
+
+        # Check to see if spacy is running
         self.spacy.is_spacy_running()
 
+    # Method to detect conflict, returns conflict list
     def detect_conflict(self,table_contents=[]):
         conflicts_redundancy = []
         conflicts_similarity = []
@@ -61,6 +65,7 @@ class ConflictDetector:
             "incomplete" : conflicts_incomplete 
         }
     
+    # Method to count total conflict
     def total_confict(self, detect_conflict_result={}):
         total = len(detect_conflict_result.get("redundancy", [])) 
         total += len(detect_conflict_result.get("similarity", [])) 
@@ -69,6 +74,7 @@ class ConflictDetector:
         total += len(detect_conflict_result.get("incomplete", [])) 
         return total
         
+    # Method to extract row in conflict list
     def extract_rows(self, conflict_list, num):
         if num == 2 :
             return [(a[0], b[0]) for a, b in conflict_list]
@@ -76,19 +82,21 @@ class ConflictDetector:
             print (a[0] for a in conflict_list)
             return [a[0] for a in conflict_list]
         
-        
+    # Method to extract id in conflict list       
     def extract_ids(self, conflict_list, num):
         if num == 2 :
             return [(a[1], b[1]) for a, b in conflict_list]
         else:
             return [a[1] for a in conflict_list]
 
+    # Method to extract requirement in conflict list
     def extract_reqs(self, conflict_list, num):
         if num == 2 :
             return [(a[2], b[2]) for a, b in conflict_list]
         else:
             return [a[2] for a in conflict_list]
     
+    # Method to get conflict detection progress
     def progress(self, current, total):
         return int((current / total) * 100)
 

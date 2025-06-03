@@ -1,17 +1,19 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QScrollArea, QFrame, QSizePolicy, QMessageBox
-from PySide6.QtCore import Qt, Signal, QObject, QUrl
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QScrollArea, QSizePolicy, QMessageBox
+from PySide6.QtCore import Qt
 
 from modules.conflictSolver import ConflictSolver
-from modules.fileOperations import FileOperations
 
+# Class for warning notifications about requirement conflicts
 class WarningSection(QWidget):
     def __init__(self, tab_widget, media_player):
         super().__init__()
 
+        # Variables
         self.conflict_solver = ConflictSolver()
         self.tab_widget = tab_widget
         self.media_player = media_player
 
+        # Layout
         main_layout = QVBoxLayout()
         self.setLayout(main_layout)
 
@@ -20,40 +22,41 @@ class WarningSection(QWidget):
         scroll.setWidgetResizable(True)
         main_layout.addWidget(scroll)
 
-
         #Scroll_frame
         scroll_frame = QWidget()
         scroll.setWidget(scroll_frame)
 
-
+        # Warning notification area layout
         self.warning_layout = QVBoxLayout()
         self.warning_layout.setAlignment(Qt.AlignTop)
         scroll_frame.setLayout(self.warning_layout)
         scroll_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
-
         main_layout.addWidget(scroll)
 
+        # Dismiss button below notification area
         dismiss_button = QPushButton("Dismiss Warnings")
         dismiss_button.clicked.connect(self.clear_warnings_and_highlights)
         main_layout.addWidget(dismiss_button)
 
-
+    # setter for tab widget
     def set_tab_widget(self,tab_widget):
         self.tab_widget = tab_widget
 
-
+    # Method to clear all warning notifications
     def clear_warnings(self):
         while self.warning_layout.count():
             child = self.warning_layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
+    # Method to delete a warning notification
     def delete_warning(self, warning):
         if warning is not None:
             warning.warning_layout.removeWidget(warning)
             warning.setParent(None)
             warning.deleteLater()
 
+    # Method to add warning notification
     def add_warning(self, warning_type, text1="Top", text2="Desc", conflict_type=None, item1=None, item2=None):
         bubble = QWidget()
         bubble.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
@@ -104,10 +107,12 @@ class WarningSection(QWidget):
         self.warning_layout.addWidget(bubble)
         quick_fix_btn.clicked.connect(lambda: self.solve_warning(conflict_type, item1, item2))
 
+    # Method to clear all warning notification and highlighted list contents
     def clear_warnings_and_highlights(self):
         self.clear_warnings()
         self.tab_widget.currentWidget().clear_highlights()
 
+    # Method to add status into the notification area
     def add_status(self, text):
         bubble = QWidget()
         layout = QVBoxLayout()
@@ -127,10 +132,9 @@ class WarningSection(QWidget):
         self.warning_layout.setAlignment(Qt.AlignTop)
         self.warning_layout.addWidget(bubble)
 
+    # Method to add conflict warning notifications
     def conflict_warning(self, conflicts={}, table=None):
         self.clear_warnings()
-        print("This is conflict warning")
-        print(conflicts)
 
         conflict_types = ["similarity", "redundancy", "contradiction"]
         total = sum(len(conflicts.get(key, [])) for key in ["similarity", "redundancy", "contradiction", "ambiguity", "incomplete"])
@@ -176,11 +180,11 @@ class WarningSection(QWidget):
         else:
             self.add_status("🟢 No conflict detected.")
 
+    # Method to solve conflict warning notifications
     def solve_warning(self, warning_type=None, item1=None, item2=None):
         # Single-item conflict
         if item2 is None:
             row_item, id_item, req_item = item1
-            print(f"Fixing {warning_type.lower()} conflict of Row {row_item + 1}")
 
             msg = QMessageBox()
             
@@ -214,11 +218,11 @@ class WarningSection(QWidget):
             if result is not None:
                 if warning_type == "ambiguity":
                     new_text = result
-                    self.add_status(f"✅ Ambiguity resolved for {id_item or f'Row {row_item + 1}'}")
+                    self.add_status(f"Ambiguity resolved for {id_item or f'Row {row_item + 1}'}")
                     if hasattr(current_section, "update_row_text"):
                         current_section.update_row_text(row_item, new_text)
                 elif warning_type == "incomplete":
-                    self.add_status(f"🗑️ Incomplete requirement deleted: {id_item or f'Row {row_item + 1}'}")
+                    self.add_status(f"Incomplete requirement deleted: {id_item or f'Row {row_item + 1}'}")
                     if hasattr(current_section, "remove_conflict_row"):
                         current_section.remove_conflict_row(row_item)
 
@@ -230,8 +234,6 @@ class WarningSection(QWidget):
         else:
             row1, id1, req1 = item1
             row2, id2, req2 = item2
-
-            print(f"Fixing {warning_type.lower()} conflict between Row {row1 + 1} and Row {row2 + 1}")
 
             msg = QMessageBox()
             msg.setWindowTitle("Resolve Conflict")
@@ -261,7 +263,7 @@ class WarningSection(QWidget):
 
             if result is not None:
                 kept_row, kept_id, _ = result
-                self.add_status(f"✅ Conflict resolved. Kept: {kept_id or f'Row {kept_row + 1}'}")
+                self.add_status(f"Conflict resolved. Kept: {kept_id or f'Row {kept_row + 1}'}")
 
                 current_section = self.tab_widget.currentWidget()
                 if hasattr(current_section, "remove_conflict_row"):

@@ -1,24 +1,20 @@
 from PySide6.QtWidgets import (
-    QWidget, QFileDialog, QMenuBar, QMessageBox, QMenu,
-    QLabel, QTableWidget, QTableWidgetItem, QPushButton, 
-    QDialog, QFormLayout, QLineEdit, QSpinBox, QDialogButtonBox, QInputDialog,
-    QFontDialog, QApplication
+    QWidget, QFileDialog, QMessageBox, QTableWidgetItem,
+    QDialog, QFormLayout, QLineEdit, QSpinBox, QDialogButtonBox, 
+    QInputDialog, QFontDialog 
 )
 
-from PySide6.QtGui import QPalette, QColor, QFont
-from PySide6.QtCore import QEvent, Qt
-
-from ui.tabsection import TabSection
 from ui.requirementsection import RequirementSection
 from modules.fileOperations import FileOperations
-from modules.backupOperations import BackupOperations
 from data.template import template
-
 import qdarktheme
 
+# Class for the menus on the top part of the app
 class MenuSection(QWidget):
     def __init__(self, window, media_player, tab_widget, warning_widget, conflict_detector, backup):
         super().__init__()
+
+        # Variables
         self.window = window
         self.media_player = media_player
         self.tab_widget = tab_widget
@@ -26,19 +22,24 @@ class MenuSection(QWidget):
         self.conflict_detector = conflict_detector
         self.backup = backup
         self.menu_bar = self.window.menuBar()
-
         self.sound_action = None
 
-        self.create_menus()
+        self.create_menus() # Calling create menu method
 
+    # Method to create menu options for the main window
     def create_menus(self):
+
+        # Create menu actions
+        #___FILE MENU____
         file_menu = self.menu_bar.addMenu("&File")
         import_action = file_menu.addAction("Import")
-        export_action = file_menu.addAction("Export")
-        export_text_action = file_menu.addAction("Export as text")
+        export_action = file_menu.addMenu("Export")
+        export_json_action = export_action.addAction("Export")
+        export_text_action = export_action.addAction("Export (.txt)")
         template_action = file_menu.addAction("Template")
         save_action = file_menu.addAction("Save")
 
+        #___PREFERENCE MENU___
         preference_menu = self.menu_bar.addMenu("&Preference")
         mode_action = preference_menu.addMenu("Modes")
         light_mode_action = mode_action.addAction("Light Mode")
@@ -49,60 +50,52 @@ class MenuSection(QWidget):
         self.sound_action.setCheckable(True)
         self.sound_action.setChecked(True)
 
+        #___MODIFY MENU___
         modify_menu = self.menu_bar.addMenu("&Modify")
         compare_action = modify_menu.addAction("Compare Lists")
         merge_action = modify_menu.addAction("Merge Lists")
         identification_action = modify_menu.addAction("Auto Identification")
 
+        #___SEARCH MENU___
         search_action = self.menu_bar.addAction("&Search")
 
 
-        # Connect actions to methods
+        # Connect menu actions to methods
+        #___FILE ACTIONS___
         import_action.triggered.connect(self.import_requirements)
-        export_action.triggered.connect(self.export_requirements)
+        export_json_action.triggered.connect(self.export_requirements)
         export_text_action.triggered.connect(self.export_requirements_as_txt)
         template_action.triggered.connect(self.requirement_template)
         save_action.triggered.connect(self.save_progress)
 
+        #___PREFERENCE ACTIONS___
         light_mode_action.triggered.connect(self.light_mode)
         dark_mode_action.triggered.connect(self.dark_mode)
         auto_mode_action.triggered.connect(self.auto_mode)
         font_action.triggered.connect(self.change_font)
         self.sound_action.triggered.connect(self.toggle_sound)
 
+        #___MODIFY ACTIONS___
         compare_action.triggered.connect(self.compare_requirements)
         merge_action.triggered.connect(self.merge_requirements)
         identification_action.triggered.connect(self.automatic_identification)
 
+        #___SEARCH ACTIONS___
         search_action.triggered.connect(self.search)
 
-
-    # Right click Menu
-    def eventFilter(self, source, event):
-        if event.type() == QEvent.ContextMenu:
-            widget = self.window.widgetAt(event.globalPos())
-
-            # Check if the right-click is on a QTableWidget
-            if isinstance(widget, QTableWidget):
-                self.show_table_context_menu(event.globalPos(), widget)
-                return True 
-
-        return super().eventFilter(source, event)
-    
-    def show_table_context_menu(self, global_pos, table_widget):
-        menu = QMenu()
-
-        selected_action = menu.exec(global_pos)
-
+    # Method for dark mode
     def dark_mode(self):
         qdarktheme.setup_theme("dark")
 
+    # Method for light mode
     def light_mode(self):
         qdarktheme.setup_theme("light")
 
+    # Method to follow device's mode
     def auto_mode(self):
         qdarktheme.setup_theme("auto")
-        
+
+    # Method for changing app font      
     def change_font(self):
         ok, font = QFontDialog.getFont(self.window)
         if ok:
@@ -110,18 +103,18 @@ class MenuSection(QWidget):
 
             # Recursively apply to existing widgets
             def apply_font_recursively(widget):
-                print(f"Applying font to: {widget}")
                 widget.setFont(font)
                 for child in widget.findChildren(QWidget):
                     apply_font_recursively(child)
 
             apply_font_recursively(self.window)
 
+    # Method for turning sound on/off
     def toggle_sound(self):
         is_checked = self.sound_action.isChecked()
-        print(is_checked)
         self.media_player.toggle_sound(is_checked)
 
+    # Method for importing requirement list (.json)
     def import_requirements(self):
         filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
 
@@ -145,6 +138,7 @@ class MenuSection(QWidget):
             except Exception as e:
                 QMessageBox.critical(self, "Import Failed", f"Error: {e}")   
 
+    # Method for exporting requirement list (.json)
     def export_requirements(self):
         filepath, _ = QFileDialog.getSaveFileName(self, "Save Requirements", "", "JSON Files (*.json)")
 
@@ -156,7 +150,8 @@ class MenuSection(QWidget):
                 QMessageBox.information(self, "Export Successful", f"Exported to {filepath}")
             else:
                 QMessageBox.warning(self, "Export Error", "Not a requirement tab!")
-            
+
+    # Method for exporting requirement list (.txt)           
     def export_requirements_as_txt(self):
         filepath, _ = QFileDialog.getSaveFileName(self, "Save Requirements as TXT", "", "Text Files (*.txt)")
 
@@ -186,6 +181,7 @@ class MenuSection(QWidget):
             else:
                 QMessageBox.warning(self, "Export Error", "Not a requirement tab!")
 
+    # Method for getting requirement templates
     def requirement_template(self):
         # Available templates mapped to their variable names
         templates = {
@@ -220,6 +216,7 @@ class MenuSection(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Import Template Failed", f"Error: {e}")   
 
+    # Method for comparing between requirement list
     def compare_requirements(self):
         # Ask user which tab to compare with
         current_index = self.tab_widget.currentIndex()
@@ -270,6 +267,7 @@ class MenuSection(QWidget):
         tab_A.show_combined_conflicts(conflicts)
         tab_B.show_combined_conflicts(conflicts)
 
+    # Method for merging between requirement list
     def merge_requirements(self):
         filepath, _ = QFileDialog.getOpenFileName(self, "Import Requirements", "", "JSON Files (*.json)")
 
@@ -299,6 +297,7 @@ class MenuSection(QWidget):
             except Exception as e:
                 QMessageBox.critical(self, "Merge Failed Failed", f"Error: {e}") 
 
+    # Method for automatically create requirement ID (eg. REQ-001)
     def automatic_identification(self):
         current_tab = self.tab_widget.currentWidget()
         dialog = QDialog(self)
@@ -349,10 +348,11 @@ class MenuSection(QWidget):
             table.setItem(row, 0, QTableWidgetItem(new_id))
             start_num += 1
 
+    # Method for saving progress in app
     def save_progress(self):
         self.backup.perform_backup()
 
-
+    # Method for searching item in requirement list
     def search(self):
         # Ask the user for search text
         current_tab = self.tab_widget.currentWidget()

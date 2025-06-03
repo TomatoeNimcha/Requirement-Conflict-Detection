@@ -3,15 +3,15 @@
 from modules.fileOperations import FileOperations
 import os
 import json
-import datetime
 
 class BackupOperations:
     def __init__(self, tab_widget):
+        # Variables
         self.tab_widget = tab_widget
         self.file_operations = FileOperations
         self.BACKUP_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "backup", "backup.json")
         
-
+    # Method to perform backup
     def perform_backup(self):
         print("Backup performed")
         all_data = []
@@ -27,6 +27,7 @@ class BackupOperations:
         with open(self.BACKUP_FILE, 'w', encoding='utf-8') as f:
             json.dump(all_data, f, indent=4, ensure_ascii=False)
 
+    # Method to retrieve backup
     def retrieve_backup(self):
         print("Backup Retrieved")
         if self.is_backup_empty() == True:
@@ -53,6 +54,7 @@ class BackupOperations:
                 new_tab.update_any_text(row_index, 2, str(item.get("attributes", "")))
             new_tab.add_row()
 
+    # Method to check if the backup is empty
     def is_backup_empty(self):
         if os.path.getsize(self.BACKUP_FILE) == 0:
             return True

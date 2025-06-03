@@ -1,19 +1,17 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QTableWidget, QTableWidgetItem, QPushButton,
-    QTabWidget, QWidget, QInputDialog, QTabBar, QMessageBox
-)
+from PySide6.QtWidgets import QWidget, QTabWidget, QWidget, QInputDialog, QTabBar, QMessageBox
 
 from ui.requirementsection import RequirementSection
-from modules.backupOperations import BackupOperations
 
+# Class for tabs below the menu bar
 class TabSection(QTabWidget):
     def __init__(self, warning_widget, conflict_detector):
         super().__init__()
 
+        # Variables
         self.warning_widget = warning_widget
         self.conflict_detector = conflict_detector
 
+        # Set tab style and closability
         self.setStyleSheet("QTabBar::tab { height: 30px; padding: 8px; }")
         self.setTabsClosable(True)
 
@@ -31,6 +29,7 @@ class TabSection(QTabWidget):
         self.currentChanged.connect(self.user_add_requirement_tab)
         self.tabCloseRequested.connect(self.close_tab)
 
+    # Method for when user adds requirement tab
     def user_add_requirement_tab(self, index):
         if self.tabText(index) == "+":
             # 1. Ask for tab name
@@ -41,7 +40,7 @@ class TabSection(QTabWidget):
             else:
                 self.add_requirement_tab(title=name)
 
-
+    # Method for when system adds requirement tab
     def add_requirement_tab(self, title=None, author=None):
         index = self.count() - 1  # always insert before "+" tab
         tab_name = title if title else f"List {index + 1}"
@@ -51,6 +50,7 @@ class TabSection(QTabWidget):
  
         return tab
 
+    # Method for closing tab
     def close_tab(self, index):
         # Prevent closing the "+" tab
         if self.widget(index) == self.plus_tab:
