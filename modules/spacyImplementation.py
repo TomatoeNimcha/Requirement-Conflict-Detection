@@ -44,13 +44,13 @@ class SpacyImplementation:
 
     # Method to check if two sentences are very similar 
     def similarity_check(self, similarity=0.0):
-        return similarity > 0.9490 and similarity < 1.0
+        return similarity > 0.9690 and similarity < 1.0
 
     # Method to check if one sentence is negating the other sentence
     def contradiction_check(self, similarity=0.0, sentence1="", sentence2=""):
         has_neg1 = any(neg in sentence1  for neg in self.negative_keywords)
         has_neg2 = any(neg in sentence2  for neg in self.negative_keywords)
-        if similarity > 0.9490 and similarity < 1.0:
+        if similarity > 0.9690 and similarity < 1.0:
             if has_neg1 != has_neg2:
                 return True
         else :
@@ -106,9 +106,12 @@ class SpacyImplementation:
 
         # Check if there's a subject (nsubj = nominal subject)
         has_subject = any(tok.dep_ in ("nsubj", "nsubjpass") for tok in doc)
+        if not has_subject:
+            # Check for a proper noun or pronoun early in sentence
+            has_subject = any(tok.pos_ in ("NOUN", "PROPN", "PRON") and tok.i < 3 for tok in doc)
 
         # Check if there's a main verb (ROOT verb or auxiliary verb)
-        has_verb = any(tok.dep_ == "ROOT" and tok.pos_ in ("VERB", "AUX") for tok in doc)
+        has_verb = any(tok.dep_ in ("ROOT", "aux") and tok.pos_ in ("VERB", "AUX") for tok in doc)
 
         # If it's missing either subject or verb, it's probably incomplete
         if not has_subject or not has_verb:
@@ -124,4 +127,15 @@ class SpacyImplementation:
 
         # Otherwise, it seems complete
         return False
+    
+test = SpacyImplementation()
+
+sentence1 = "The system shall allow users to add products to a cart."
+sentence2 = "The system shall allow users to remove items from the cart."
+
+for_print = test.spacy_similarity(
+    test.get_nlp(sentence1),
+    test.get_nlp(sentence2))
+
+print(for_print)
 

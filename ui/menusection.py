@@ -166,11 +166,11 @@ class MenuSection(QWidget):
                 lines.append(f"Title: {title}")
                 lines.append(f"Author: {author}")
                 lines.append("\nRequirements:")
-                lines.append("Row | ID | Description | Attributes")
+                lines.append("No. | ID | Description | Attributes")
                 lines.append("-" * 60)
 
                 for row, req_id, req_text, req_att in table_data:
-                    lines.append(f"{row} | {req_id} | {req_text} | {req_att}")
+                    lines.append(f"{row+1} | {req_id} | {req_text} | {req_att}")
 
                 try:
                     with open(filepath, "w", encoding="utf-8") as f:

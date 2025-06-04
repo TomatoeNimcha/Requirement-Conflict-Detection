@@ -1,16 +1,5 @@
 [
     {
-        "title": "Software Requirements",
-        "author": "Default Author",
-        "requirementList": [
-            {
-                "requirementID": "REQ-001",
-                "requirement": "User can log in",
-                "attributes": "Functional Requirement"
-            }
-        ]
-    },
-    {
         "title": "Evaluation Testing",
         "author": "Default Author",
         "requirementList": [
@@ -72,6 +61,568 @@
             {
                 "requirementID": "ID12",
                 "requirement": "The admin may ban any users from reading the forum.",
+                "attributes": ""
+            }
+        ]
+    },
+    {
+        "title": "E-Commerce Website Requirements",
+        "author": "Default Author",
+        "requirementList": [
+            {
+                "requirementID": "F01-UM",
+                "requirement": "The system shall allow users to register using email and password.",
+                "attributes": "Functional, User Management"
+            },
+            {
+                "requirementID": "F02-UM",
+                "requirement": "The system shall validate email format during registration.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F03-UM",
+                "requirement": "The system shall allow users to log in securely.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F04-UM",
+                "requirement": "The system shall allow password recovery via email.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F05-UM",
+                "requirement": "The system shall allow users to update their profile information.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F06-UM",
+                "requirement": "The system shall support user logout.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F07-UM",
+                "requirement": "The system shall prevent duplicate email registration.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F08-UM",
+                "requirement": "The system shall allow administrators to ban users.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F09-UM",
+                "requirement": "The system shall allow users to change their passwords.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F10-UM",
+                "requirement": "The system shall prevent access to the admin panel by non-admins.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F01-PM",
+                "requirement": "The system shall allow admins to add new products.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F02-PM",
+                "requirement": "The system shall allow admins to edit product details.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F03-PM",
+                "requirement": "The system shall allow admins to delete products.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F04-PM",
+                "requirement": "The system shall allow products to be categorized.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F05-PM",
+                "requirement": "The system shall allow multiple product images.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F06-PM",
+                "requirement": "The system shall allow products to have descriptions and specifications.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F07-PM",
+                "requirement": "The system shall allow setting product prices.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F08-PM",
+                "requirement": "The system shall support stock quantity tracking.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F09-PM",
+                "requirement": "The system shall notify admin when stock is low.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F10-PM",
+                "requirement": "The system shall allow tagging products with keywords.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F01-SC",
+                "requirement": "The system shall allow users to add products to a cart.",
+                "attributes": "Functional Requirement, Shopping Cart"
+            },
+            {
+                "requirementID": "F02-SC",
+                "requirement": "The system shall persist cart items across sessions.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F03-SC",
+                "requirement": "The system shall allow users to remove items from the cart.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F04-SC",
+                "requirement": "The system shall allow users to change the quantity of items in the cart.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F05-SC",
+                "requirement": "The system shall prevent users from adding out-of-stock items.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F06-SC",
+                "requirement": "The system shall display total cart price dynamically.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F07-SC",
+                "requirement": "The system shall apply discounts/coupons to cart total.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F08-SC",
+                "requirement": "The system shall restrict cart size to available inventory.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F09-SC",
+                "requirement": "The system shall not allow checkout with an empty cart.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "F01-CP",
+                "requirement": "The system shall allow users to review order details before payment.",
+                "attributes": "Functional, Checkout & Payment"
+            },
+            {
+                "requirementID": "F02-CP",
+                "requirement": "The system shall allow payments via credit card and PayPal.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF01-P",
+                "requirement": "The system shall load product pages within 2 seconds.",
+                "attributes": "Non-Functional, Performance"
+            },
+            {
+                "requirementID": "NF02-P",
+                "requirement": "The system shall handle up to 1000 concurrent users.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF03-P",
+                "requirement": "The system shall complete checkout process within 5 seconds.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF04-P",
+                "requirement": "The system shall cache static content for faster delivery.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF05-P",
+                "requirement": "The system shall maintain 99.9% uptime.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF01-S",
+                "requirement": "The system shall use HTTPS for all communication.",
+                "attributes": "Non-Functional, Security"
+            },
+            {
+                "requirementID": "NF02-S",
+                "requirement": "The system shall hash user passwords securely.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF03-S",
+                "requirement": "The system shall prevent SQL injection.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF04-S",
+                "requirement": "The system shall log failed login attempts.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF05-S",
+                "requirement": "The system shall timeout user sessions after 30 minutes.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF06-S",
+                "requirement": "The system shall encrypt payment details in transit.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF01-U",
+                "requirement": "The system shall be mobile responsive.",
+                "attributes": "Non-Functional, Usability"
+            },
+            {
+                "requirementID": "NF02-U",
+                "requirement": "The system shall support screen readers for accessibility.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF03-U",
+                "requirement": "The system shall have a product search with autocomplete.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF04-U",
+                "requirement": "The system shall use clear error messages for user input issues.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF01-SM",
+                "requirement": "The system shall support modular design for adding new features.",
+                "attributes": "Non-Functional, Scalability & Maintainability"
+            },
+            {
+                "requirementID": "NF02-SM",
+                "requirement": "The system shall separate frontend and backend concerns.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF03-SM",
+                "requirement": "The system shall allow adding new payment gateways easily.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "NF04-SM",
+                "requirement": "The system shall support multilingual product descriptions.",
+                "attributes": ""
+            }
+        ]
+    },
+    {
+        "title": "Requirement Conflict Detection Test",
+        "author": "Default Author",
+        "requirementList": [
+            {
+                "requirementID": "ID 1",
+                "requirement": "The system shall allow users to register using email and password.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 2",
+                "requirement": "The system shall validate email format during registration.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 3",
+                "requirement": "The system shall notify admin when stock is running low.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 4",
+                "requirement": "The system shall allow users to log in securely.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 5",
+                "requirement": "The system shall allow password recovery via email.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 6",
+                "requirement": "The system shall allow users to update their profile information.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 7",
+                "requirement": "The system shall support user logout.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 8",
+                "requirement": "The system shall prevent duplicate email registration.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 9",
+                "requirement": "The system shall allow administrators to ban users.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 10",
+                "requirement": "The system shall allow users to change their passwords.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 11",
+                "requirement": "The system shall support user logout.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 12",
+                "requirement": "The system shall prevent access to the admin panel by non-admins.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 13",
+                "requirement": "The system shall allow admins to add new products.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 14",
+                "requirement": "The system shall not allow multiple product images.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 15",
+                "requirement": "The system shall allow admins to edit product details.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 16",
+                "requirement": "The system shall allow admins to delete products.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 17",
+                "requirement": "The system shall allow products to be categorized.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 18",
+                "requirement": "The system must not allow setting product prices.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 19",
+                "requirement": "The system shall allow multiple product images.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 20",
+                "requirement": "The user",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 21",
+                "requirement": "The system shall allow products to have descriptions and specifications.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 22",
+                "requirement": "The system shall allow setting product prices.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 23",
+                "requirement": "The system shall support stock quantity tracking.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 24",
+                "requirement": "The system shall notify admin when stock is low.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 25",
+                "requirement": "The system shall allow tagging products with keywords.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 26",
+                "requirement": "The system shall allow users to add products to a cart.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 27",
+                "requirement": "The system shall persist cart items across sessions.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 28",
+                "requirement": "The system shall allow users to remove items from the cart.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 29",
+                "requirement": "The system shall allow users to change the quantity of items in the cart.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 30",
+                "requirement": "The system shall prevent users from adding out-of-stock items.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 31",
+                "requirement": "The system shall display total cart price dynamically.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 32",
+                "requirement": "The system shall apply discounts/coupons to cart total.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 33",
+                "requirement": "The system shall restrict cart size to available inventory.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 34",
+                "requirement": "The system shall not allow checkout with an empty cart.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 35",
+                "requirement": "The system shall allow users to review order details before payment.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 36",
+                "requirement": "The system shall allow payments via credit card and PayPal.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 37",
+                "requirement": "The system shall load product pages within 2 seconds.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 38",
+                "requirement": "The system shall handle up to 1000 concurrent users.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 39",
+                "requirement": "The system shall complete checkout process within 5 seconds.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 40",
+                "requirement": "The system shall cache static content for faster delivery.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 41",
+                "requirement": "The system shall maintain 99.9% uptime.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 42",
+                "requirement": "The system shall use HTTPS for all communication.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 43",
+                "requirement": "The system shall load product pages within 2 seconds.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 44",
+                "requirement": "The system shall hash user passwords securely.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 45",
+                "requirement": "The system shall prevent SQL injection.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 46",
+                "requirement": "The system shall log failed login attempts.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 47",
+                "requirement": "The system shall timeout user sessions after 30 minutes.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 48",
+                "requirement": "The system shall encrypt payment details in transit.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 49",
+                "requirement": "The system shall be mobile responsive.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 50",
+                "requirement": "The system shall support screen readers for accessibility.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 51",
+                "requirement": "The system shall have a product search with autocomplete.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 52",
+                "requirement": "The system shall use clear error messages for user input issues.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 53",
+                "requirement": "The system could use HTTPS for all communication.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 54",
+                "requirement": "The system might allow users to remove items from the cart.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 55",
+                "requirement": "The system shall support modular design for adding new features.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 56",
+                "requirement": "The system shall separate frontend and backend concerns.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 67",
+                "requirement": "The system shall handle up to 2000 concurrent users.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 68",
+                "requirement": "The system shall allow adding new payment gateways easily.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 69",
+                "requirement": "The system shall support multilingual product descriptions.",
+                "attributes": ""
+            },
+            {
+                "requirementID": "ID 60",
+                "requirement": "The",
                 "attributes": ""
             }
         ]

@@ -1,6 +1,6 @@
 Requirement Conflict Detection Software__
 
-Version : Alpha 1.0
+Version : Alpha 1.1
 Last Updated : 4/6/2025
 
 By : Yasmina Hanafiah
