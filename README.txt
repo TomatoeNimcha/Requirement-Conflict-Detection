@@ -8,6 +8,7 @@ Made for : Final Year Project 2025
 
 Made with:
 - Spacy (https://spacy.io/)
+- PySide6
 - Python 3.10.4
 - qdarktheme by Yunosuke Ohsugi (https://pypi.org/project/pyqtdarktheme/)
 - BeepBox by John Nesky (https://www.beepbox.co/)
